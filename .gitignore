@@ -1,1 +1,8 @@
+## ignore system created files
 .DS_Store
+
+## ignore vscode settings
+.vscode/
+
+## ignore sqlite database
+db.sqlite3

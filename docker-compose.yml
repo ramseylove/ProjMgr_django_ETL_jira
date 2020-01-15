@@ -1,0 +1,15 @@
+version: '3.7'
+
+services: 
+    web:
+        build: .
+        command: python manage.py runserver 0.0.0.0:8000
+        environment:
+            - ENVIRONMENT=development
+            - SECRET_KEY=y!ahmu00n86=)aj$$b8k0y!0fau%o42)t=)#*5n*8qz3e8jwhtx
+            - DEBUG=1
+            - SENDGRID_SMTPKEY=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
+        volumes: 
+            - .:/code
+        ports: 
+            - 8000:8000
