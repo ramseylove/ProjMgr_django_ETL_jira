@@ -45,10 +45,14 @@ INSTALLED_APPS = [
     'allauth.account',
     'crispy_forms',
     'debug_toolbar',
+    'django_extensions',
+    'jira',
+    'arrow',
 
     # Local Apps
     'users.apps.UsersConfig',
-    'pages.apps.PagesConfig'
+    'pages.apps.PagesConfig',
+    'project_manager.apps.ProjectManagerConfig',
 ]
 
 MIDDLEWARE = [
@@ -181,6 +185,11 @@ ACCOUNT_UNIQUE_EMAIL = True
 
 # Defines whether to allow sign up
 ACCOUNT_ADAPTER = 'users.account_adapter.NoNewUsersAccountAdapter'
+
+# Jira Config
+JIRA_URL = 'https://atriadev.atlassian.net'
+JIRA_KEY = os.environ.get('JIRA_KEY')
+JIRA_USER = 'meyeryan@outlook.com'
 
 # django-debug-toolbar
 import socket
