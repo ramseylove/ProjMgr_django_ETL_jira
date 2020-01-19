@@ -9,4 +9,4 @@ class Project(models.Model):
     slug = AutoSlugField(populate_from='p_key')
 
     def __str__(self):
-        return self.key
+        return self.p_key

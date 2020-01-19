@@ -1,8 +1,10 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
+from project_manager.models import Project 
+
 class CustomUser(AbstractUser):
-    pass
+    projects = models.ManyToManyField(Project)
 
     def __str__(self):
         return self.email

@@ -189,7 +189,7 @@ ACCOUNT_ADAPTER = 'users.account_adapter.NoNewUsersAccountAdapter'
 # Jira Config
 JIRA_URL = 'https://atriadev.atlassian.net'
 JIRA_KEY = os.environ.get('JIRA_KEY')
-JIRA_USER = 'meyeryan@outlook.com'
+JIRA_USER = 'ryan@atriadev.com'
 
 # django-debug-toolbar
 import socket

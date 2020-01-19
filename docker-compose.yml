@@ -9,7 +9,7 @@ services:
             - SECRET_KEY=^l2-z86&t%dv%iywa-j@)j9m9s(fj@4%4qz8%u^m_p8w*obsf1
             - DEBUG=1
             - SENDGRID_SMTPKEY=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
-            - JIRA_KEY=ifdqaZ5XnNl1flpfhGJt6AD4
+            - JIRA_KEY=HK0cCGHJ5YuxsU83gHxY38C3
         volumes: 
             - .:/code
         ports: 

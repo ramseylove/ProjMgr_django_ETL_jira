@@ -26,7 +26,7 @@
                         <div class="ibox-title">
                             <h5>Issue list</h5>
                             <div class="ibox-tools">
-                                <a href="" class="btn btn-primary btn-xs">Add new issue</a>
+                                <a href="#" class="btn btn-primary btn-xs">Add new issue</a>
                             </div>
                         </div>
                         <div class="ibox-content">
@@ -49,27 +49,38 @@
                             <div class="table-responsive">
                             <table class="table table-hover issue-tracker">
                                 <tbody>
+                                <thead>
+                                    <th>
+                                        Status
+                                    </th>
+                                    <th>
+                                        Summary
+                                    </th>
+                                    <th>
+                                        Updated at
+                                    </th>
+                                    <th>
+                                        Type
+                                    </th>
+                                </thead>
                                 {% for issue in issues %}
                                 <tr>
                                     <td>
-                                        <span class="label label-primary">{{ issue.fields.status.name}}</span>
+                                        <span class="label label-primary">{{ issue.status}}</span>
                                     </td>
                                     <td class="issue-info">
-                                            <a href="{% url 'issue_detail' issue.key %}">{{ issue.key }}</a>
+                                            <a href="{% url 'issue_detail' issue.project issue.key %}">{{ issue.key }}</a>
                                         </a>
 
                                         <small>
-                                            {{ issue.fields.summary }}
+                                            {{ issue.summary }}
                                         </small>
                                     </td>
                                     <td>
-                                        {{ issue.fields.creator }}
-                                    </td>
-                                    <td>
-                                        12.02.2015 10:00 am
+                                        {{ issue.updated_at }}
                                     </td>
                                     <td class="text-right">
-                                        <button class="btn btn-white btn-xs"> {{ issue.fields.issuetype }}</button>
+                                        <button class="btn btn-white btn-xs"> {{ issue.type }}</button>
                                     </td>
                                 </tr>
                                 {% endfor %}
