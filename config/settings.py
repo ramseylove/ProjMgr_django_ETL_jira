@@ -166,8 +166,8 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 
 # Django-Allauth Config
-LOGIN_REDIRECT_URL = 'home'
-ACCOUNT_LOGOUT_REDIRECT_URL = 'home'
+LOGIN_REDIRECT_URL = 'projects'
+ACCOUNT_LOGOUT_REDIRECT_URL = 'account_login'
 
 AUTHENTICATION_BACKENDS = (
     "django.contrib.auth.backends.ModelBackend",
@@ -182,6 +182,7 @@ ACCOUNT_USERNAME_REQUIRED = False
 ACCOUNT_AUTHENTICATION_METHOD = 'email'
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_UNIQUE_EMAIL = True
+ACCOUNT_LOGOUT_ON_GET = True
 
 # Defines whether to allow sign up
 ACCOUNT_ADAPTER = 'users.account_adapter.NoNewUsersAccountAdapter'

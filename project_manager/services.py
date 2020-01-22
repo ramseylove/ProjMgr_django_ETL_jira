@@ -31,16 +31,15 @@ def get_issue_ratio(project_key):
             'status': issue.fields.status.name,
         })
     
-    
     for issue in issues:
-        if issue['status'] == 'Done':
+        if issue['status'] == 'Done' or issue['status'] == 'Reviewed':
             done_count += 1
         else:
             pass
         
     print('total: ' + str(total))
     print('done_count: ' + str(done_count))
-    ratio = float((done_count / total) * 100) 
+    ratio = round((done_count / total) * 100) 
 
     return ratio
 

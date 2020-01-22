@@ -2,11 +2,14 @@ from django.conf import settings
 from django.contrib import admin
 from django.urls import path, include
 
+from allauth.account.views import LoginView
+
+
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    path('notadmin/', admin.site.urls),
     path('users/', include('django.contrib.auth.urls')),
     path('accounts/', include('allauth.urls')),
-    path('', include('pages.urls')),
+    path('', LoginView.as_view()),
     path('', include('project_manager.urls'))
 ]
 
