@@ -50,10 +50,14 @@ def get_project(project_key):
     return project
 
 
-def get_issues(project_key):
+def get_issues(project_key, query=None):
     
     issues = []
-    proj = jira().search_issues('project = ' + project_key)
+    if query:
+        proj = jira().search_issues('project = ' + project_key + ' and summary ~ ' + query)
+
+    else:
+        proj = jira().search_issues('project = ' + project_key)
     
     for issue in proj:
         issues.append({
@@ -122,4 +126,10 @@ def create_issue(project_key):
         issuetype=get_issue_types(project_key),
         )
 
-    
+def search_issues(project_key, q):
+
+    result = jira().search_issues('project = ' + project_key + ' and summary ~ ' + q)
+
+    print(result)
+    print(type(result))
+    return result

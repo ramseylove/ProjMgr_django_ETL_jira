@@ -4,7 +4,7 @@
             <!--Page content-->
             <div class="row wrapper border-bottom white-bg page-heading">
                 <div class="col-lg-10">
-                    <h2>Issue list</h2>
+                    <h2>Search Results</h2>
                     <ol class="breadcrumb">
                         <li class="breadcrumb-item">
                             <a href="{% url 'projects' %}">Home</a>
@@ -25,17 +25,20 @@
                     <div class="ibox">
                         <div class="ibox-title">
                             <h5>Issue list</h5>
+                            <!--
                             <div class="ibox-tools">
                                 <a href="#" class="btn btn-primary btn-xs">Add new issue</a>
                             </div>
+                            -->
                         </div>
                         <div class="ibox-content">
 
                             <div class="m-b-lg">
 
-                                <form method="GET">
+                                
+                                <form action="{% url 'search_results' %}" method="GET">
                                 <div class="input-group input-group-sm">
-                                    <input name="query" type="text" class="form-control" placeholder="Search issue by name..." >
+                                    <input name="q"type="text" class="form-control" placeholder="Search issue by name..." >
                                     <div class="input-group-btn">
                                         <button class="btn btn-white" type="submit">Search</button>
                                     </div>
@@ -71,7 +74,7 @@
                                         <span class="label label-primary">{{ issue.status}}</span>
                                     </td>
                                     <td class="issue-info">
-                                            <a href="{% url 'issue_detail' issue.project issue.key %}">{{ issue.key }}</a>
+                                            <a href="#">{{ issue.key }}</a>
                                         </a>
 
                                         <small>

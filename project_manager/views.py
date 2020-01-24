@@ -28,8 +28,15 @@ class ProjectListView(LoginRequiredMixin, View):
 class IssueListView(LoginRequiredMixin, View):
 
     def get(self, request, key):
+        
+        if 'query' in request.GET:
+            query = request.GET['query']
+            print(query)
+            issues = get_issues(key, query)
 
-        return render(request, 'project_manager/issue_list.html', {'issues': get_issues(key) })
+            return render(request, 'project_manager/issue_search_results.html', {'issues': issues })
+        else:
+            return render(request, 'project_manager/issue_list.html', {'issues': get_issues(key) })
 
 class IssueDetailView(LoginRequiredMixin, View):
     
@@ -49,4 +56,10 @@ class IssueCreateView(LoginRequiredMixin, View):
     #         issue = form.save()
     #         issue.create
 
+class SearchResultsView(LoginRequiredMixin, View):
+
+    def get(self, request):
+        pass
+
+        return render(request, 'project_manager/issue_search_results.html', {'issues': search_issues(query)})
 
