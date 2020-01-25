@@ -4,24 +4,31 @@ import arrow
 
 from .models import Project
 
-def jira():
-    '''Connects to jira cloud
-    '''
-    options = {"server": settings.JIRA_URL }
-    jira = JIRA(options, basic_auth=(settings.JIRA_USER, settings.JIRA_KEY))
 
-    return jira
+def j():
+    """
+    Connects to jira cloud returns connection
+    """
+    options = {"server": settings.JIRA_URL }
+    j = JIRA(options, basic_auth=(settings.JIRA_USER, settings.JIRA_KEY))
+
+    return j
+
 
 def get_issue_types(project_key):
 
-    proj = jira.project(project_key)
+    data = []
+    proj = j().project(project_key)
     issue_types = proj.issueTypes
+    for types in issue_types:
+        data.append((types.name, types.name))
 
-    return issue_types
+    return data
+
 
 def get_issue_ratio(project_key):
 
-    proj = jira().search_issues('project = ' + project_key)
+    proj = j().search_issues('project = ' + project_key)
     issues = []
     total = len(proj)
     done_count = 0
@@ -43,21 +50,32 @@ def get_issue_ratio(project_key):
 
     return ratio
 
+
 def get_project(project_key):
 
-    project = jira().project(project_key)
+    project = j().project(project_key)
 
     return project
 
 
 def get_issues(project_key, query=None):
+    '''
+
+    :param project_key: MEW
+    :param query:
+    :return:
+        {'key': 'MEW-28', 'project': <JIRA Project: key='MEW', name='Messenger_ExpressionDashboard_Web', id='10013'>, 'status': 'Reviewed',
+        'summary': 'Change rotation function - replace rotation function. ', 'updated_at': datetime.datetime(2019, 12, 23, 0, 51, 33, 801000,
+        tzinfo=tzoffset(None, -21600)), 'type': <JIRA IssueType: name='Bug', id='10037'>}
+
+    '''
     
     issues = []
     if query:
-        proj = jira().search_issues('project = ' + project_key + ' and summary ~ ' + query)
+        proj = j().search_issues('project = ' + project_key + ' and summary ~ ' + query)
 
     else:
-        proj = jira().search_issues('project = ' + project_key)
+        proj = j().search_issues('project = ' + project_key)
     
     for issue in proj:
         issues.append({
@@ -74,29 +92,30 @@ def get_issues(project_key, query=None):
 
 def get_issue_detail(project_key, issue_key):
     
-    jira_issue = jira().issue(issue_key, fields='key,creator,created,updated,status,summary,issuetype,assignee,project')
+    jira_issue = j().issue(issue_key, fields='key,creator,created,updated,status,summary,issuetype,assignee,project')
     issue = {
-        'key' : jira_issue.key,
-        'creator' : jira_issue.fields.creator.displayName,
-        'created_at' : arrow.get(jira_issue.fields.created).datetime,
-        'updated_at' : arrow.get(jira_issue.fields.updated).datetime,
-        'status' : jira_issue.fields.status.name,
-        'summary' : jira_issue.fields.summary,
-        'type' : jira_issue.fields.issuetype.name,
-        'client' : jira_issue.fields.project.projectCategory.name
+        'key': jira_issue.key,
+        'creator': jira_issue.fields.creator.displayName,
+        'created_at': arrow.get(jira_issue.fields.created).datetime,
+        'updated_at': arrow.get(jira_issue.fields.updated).datetime,
+        'status': jira_issue.fields.status.name,
+        'summary': jira_issue.fields.summary,
+        'type': jira_issue.fields.issuetype.name,
+        'client': jira_issue.fields.project.projectCategory.name
         }
     
     if jira_issue.fields.assignee:
-        issue.update({'assignee':jira_issue.fields.assignee})
+        issue.update({'assignee': jira_issue.fields.assignee})
     else:
-        issue.update({'assignee':'Not Assigned'})
+        issue.update({'assignee': 'Not Assigned'})
     print(issue)
         
     return issue
 
+
 def get_issue_basic(issue_key):
 
-    jira_issue = jira().issue(issue_key, fields='updated')
+    jira_issue = j().issue(issue_key, fields='updated')
     issue = {
         'key' : jira_issue.key,
         'updated_at' : arrow.get(jira_issue.fields.updated).datetime,
@@ -105,6 +124,7 @@ def get_issue_basic(issue_key):
     print(issue)
         
     return issue
+
 
 def get_issues_in_project(project_key):
 
@@ -117,18 +137,18 @@ def get_issues_in_project(project_key):
 
     return issues_in_project
 
-def create_issue(project_key):
 
-    new_issue = jira.create_issue(
-        project=project_key, 
-        summary='New issue from jira-python',
-        description='Look into this one', 
-        issuetype=get_issue_types(project_key),
-        )
+def create_issue(issue):
+
+    new_issue = j().create_issue(fields=issue)
+    print(new_issue)
+
+    return new_issue
+
 
 def search_issues(project_key, q):
 
-    result = jira().search_issues('project = ' + project_key + ' and summary ~ ' + q)
+    result = j().search_issues('project = ' + project_key + ' and summary ~ ' + q)
 
     print(result)
     print(type(result))

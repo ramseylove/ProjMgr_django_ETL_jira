@@ -32,15 +32,11 @@
                         <div class="ibox-content">
 
                             <div class="m-b-lg">
-
-                                
-                                <form action="" method="POST">
+                                <form method="POST">
                                     {% csrf_token %}
-                                    {% form|crispy %}
-                                    <button class="btn btn-white" type="submit">Search</button>
+                                    {{ form|crispy }}
+                                    <button class="btn btn-white" type="submit">Add</button>
                                 </form>
-                                    
-                                        
                                     </div>
                                 </div>
 
@@ -50,7 +46,4 @@
                     </div>
                 </div>
             </div>
-
-
-        </div>
         {% endblock content %}
