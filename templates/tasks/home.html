@@ -27,13 +27,13 @@
                     <div class="project-list">
                         <table class="table table-hover">
                             <tbody>
-                            {% for project in projects %}
+                            {% for p in proj %}
                             <tr>
                                 <td class="project-status">
                                     <span class="label label-primary">Active</span>
                                 </td>
                                 <td class="project-title">
-                                    <a href="{% url 'issues' project.key %}">{{ project.name }}</a>
+                                    <a href="{% url 'task_list' p.id %}">{{ p.name }}</a>
                                     <br/>
                                 </td>
 {#                                <td class="project-completion">#}
@@ -43,7 +43,7 @@
 {#                                        </div>#}
 {#                                </td>#}
                                 <td class="project-actions">
-                                    <a href="{% url 'issues' project.key %}" class="btn btn-white btn-sm"><i class="fa fa-folder"></i> View </a>
+                                    <a href="#" class="btn btn-white btn-sm"><i class="fa fa-folder"></i> View </a>
                                 </td>
                             </tr>
                             {% endfor %}
@@ -56,3 +56,4 @@
     </div>
 </div>
 {% endblock content %}
+

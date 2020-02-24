@@ -7,6 +7,7 @@ class Project(models.Model):
     p_key = models.CharField(max_length=5)
     name = models.CharField(max_length=255)
     slug = AutoSlugField(populate_from='p_key')
+    p_id = models.IntegerField()
 
     def __str__(self):
-        return self.p_key
+        return self.name

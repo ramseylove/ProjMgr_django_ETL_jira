@@ -21,8 +21,8 @@
                         <div class="ibox-content">
                             <div class="m-b-lg">
                                 <form method="POST">
-                                    {% csrf_token %}
-                                    {{ form|crispy }}
+                                    {% comment %} {% csrf_token %} {% endcomment %}
+                                    {% comment %} {{ form|crispy }} {% endcomment %}
                                     <button class="btn btn-white" type="submit">Add</button>
                                 </form>
                             </div>

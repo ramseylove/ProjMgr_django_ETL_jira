@@ -13,9 +13,9 @@
                         <div class="row">
                             <div class="col-lg-12">
                                 <div class="m-b-md">
-                                    <a href="{% url 'issue_edit' issue.project_key issue.key %}" class="btn btn-white btn-xs float-right">Edit issue</a>
+                                    <a href="#" class="btn btn-white btn-xs float-right">Edit issue</a>
 
-                                    <h2>{{ issue.summary }}</h2>
+                                    <h2>{{ task.summary }}</h2>
                                 </div>
                             </div>
                         </div>
@@ -26,7 +26,7 @@
                                         <dt>Status:</dt>
                                     </div>
                                     <div class="col-sm-8 text-sm-left">
-                                        <dd class="mb-1"><span class="label label-primary">{{ issue.status }}</span></dd>
+                                        <dd class="mb-1"><span class="label label-primary">{{ task.status }}</span></dd>
                                     </div>
                                 </dl>
                                 <dl class="row mb-0">
@@ -34,7 +34,7 @@
                                         <dt>Type:</dt>
                                     </div>
                                     <div class="col-sm-8 text-sm-left">
-                                        <dd class="mb-1">{{ issue.type }}</dd>
+                                        <dd class="mb-1">No Type</dd>
                                     </div>
                                 </dl>
                                 <dl class="row mb-0">
@@ -42,7 +42,7 @@
                                         <dt>Assigned to:</dt>
                                     </div>
                                     <div class="col-sm-8 text-sm-left">
-                                        <dd class="mb-1"> {{ issue.assignee }}</dd>
+                                        <dd class="mb-1"> No assignee</dd>
                                     </div>
                                 </dl>
 
@@ -53,7 +53,7 @@
                                         <dt>Last Updated:</dt>
                                     </div>
                                     <div class="col-sm-8 text-sm-left">
-                                        <dd class="mb-1"> {{ issue.updated_at }}</dd>
+                                        <dd class="mb-1"> {{ task.updated_at }}</dd>
                                     </div>
                                 </dl>
                                 <dl class="row mb-0">
@@ -61,7 +61,7 @@
                                         <dt>Created:</dt>
                                     </div>
                                     <div class="col-sm-8 text-sm-left">
-                                        <dd class="mb-1"> {{ issue.created_at }}</dd>
+                                        <dd class="mb-1"> {{ task.created_at }}</dd>
                                     </div>
                                 </dl>
                                 <dl class="row mb-0">
@@ -78,10 +78,10 @@
                             <div class="col-lg-12">
                                 <dl class="row mb-0">
                                     <div class="col-sm-2 text-sm-right">
-                                        <dt>Description:</dt>
+                                        <dt>Details:</dt>
                                     </div>
                                     <div class="col-sm-8 text-sm-left">
-                                        <dd class="mb-1">{{ issue.description }}</dd>
+                                        <dd class="mb-1">{{ task.details }}</dd>
                                     </div>
                                 </dl>
                             </div>

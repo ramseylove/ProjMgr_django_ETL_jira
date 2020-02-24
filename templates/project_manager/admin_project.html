@@ -14,6 +14,9 @@
                 </li>
             </ol>
         </div>
+        <div class="col-sm-2">
+            <a href="{% url 'fill_data' %}" class="btn btn-primary">Fill data</a>
+        </div>
     </div>
     <div class="wrapper wrapper-content animated fadeInUp">
 <div class="row">
@@ -21,7 +24,7 @@
 
             <div class="ibox">
                 <div class="ibox-title">
-                    <h5>Active projects</h5>
+                    <h5>Your projects</h5>
                 </div>
                 <div class="ibox-content">
                     <div class="project-list">
@@ -33,17 +36,12 @@
                                     <span class="label label-primary">Active</span>
                                 </td>
                                 <td class="project-title">
-                                    <a href="{% url 'issues' project.key %}">{{ project.name }}</a>
+                                    {{ project.name }}
                                     <br/>
+                                    <!-- <small>Last Updated {{ project.last_updated }}</small> -->
                                 </td>
-{#                                <td class="project-completion">#}
-{#                                        <small>Completion with: {{ project.ratio }}%</small>#}
-{#                                        <div class="progress progress-mini">#}
-{#                                            <div style="width: {{ ratio }}%;" class="progress-bar"></div>#}
-{#                                        </div>#}
-{#                                </td>#}
-                                <td class="project-actions">
-                                    <a href="{% url 'issues' project.key %}" class="btn btn-white btn-sm"><i class="fa fa-folder"></i> View </a>
+                                <td class="">
+                                    {{ project.key }}
                                 </td>
                             </tr>
                             {% endfor %}

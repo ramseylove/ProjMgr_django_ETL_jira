@@ -13,6 +13,8 @@ django-debug-toolbar = "==2.0"
 django-extensions = "*"
 jira = "*"
 arrow = "*"
+requests-oauthlib = "*"
+psycopg2-binary = "*"
 
 [requires]
 python_version = "3.7"

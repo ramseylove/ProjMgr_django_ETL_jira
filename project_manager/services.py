@@ -54,6 +54,7 @@ def get_issue_ratio(project_key):
 def get_project(project_key):
 
     project = j().project(project_key)
+    print(project)
 
     return project
 
@@ -92,8 +93,9 @@ def get_issues(project_key, query=None):
 
 def get_issue_detail(project_key, issue_key):
     
-    jira_issue = j().issue(issue_key, fields='key,creator,created,updated,status,summary,issuetype,assignee,project')
+    jira_issue = j().issue(issue_key, fields='key,creator,created,updated,status,summary,issuetype,assignee,project,description')
     issue = {
+        'project_key': project_key,
         'key': jira_issue.key,
         'creator': jira_issue.fields.creator.displayName,
         'created_at': arrow.get(jira_issue.fields.created).datetime,
@@ -101,15 +103,19 @@ def get_issue_detail(project_key, issue_key):
         'status': jira_issue.fields.status.name,
         'summary': jira_issue.fields.summary,
         'type': jira_issue.fields.issuetype.name,
-        'client': jira_issue.fields.project.projectCategory.name
+        # 'client': jira_issue.fields.project.projectCategory.name
         }
     
     if jira_issue.fields.assignee:
         issue.update({'assignee': jira_issue.fields.assignee})
     else:
         issue.update({'assignee': 'Not Assigned'})
-    print(issue)
-        
+
+    if jira_issue.fields.description:
+        issue.update({'description': jira_issue.fields.description})
+    else:
+        issue.update({'description': ''})
+
     return issue
 
 
@@ -117,13 +123,44 @@ def get_issue_basic(issue_key):
 
     jira_issue = j().issue(issue_key, fields='updated')
     issue = {
-        'key' : jira_issue.key,
-        'updated_at' : arrow.get(jira_issue.fields.updated).datetime,
+        'key': jira_issue.key,
+        'updated_at': arrow.get(jira_issue.fields.updated).datetime,
         }
         
     print(issue)
         
     return issue
+
+
+def get_issue_to_edit(project_key, issue_key):
+    jira_issue = j().issue(issue_key,
+                           fields='key,creator,status,summary,issuetype,project,description')
+    issue = {
+        'project_key': project_key,
+        'key': jira_issue.key,
+        'status': jira_issue.fields.status.name,
+        'summary': jira_issue.fields.summary,
+        'issuetype': jira_issue.fields.issuetype.name,
+        # 'client': jira_issue.fields.project.projectCategory.name
+    }
+
+    if jira_issue.fields.description:
+        issue.update({'description': jira_issue.fields.description})
+    else:
+        issue.update({'description': ''})
+
+    print(issue)
+    return issue
+
+
+def update_issue(issue_key, data):
+    jira_issue = j().issue(issue_key,
+                           fields='summary,issuetype,description')
+
+    response = jira_issue.update(fields=data)
+
+    print(response)
+    return response
 
 
 def get_issues_in_project(project_key):
@@ -146,10 +183,31 @@ def create_issue(issue):
     return new_issue
 
 
-def search_issues(project_key, q):
+def get_all_projects():
+    '''
+    Used for getting all project keys for adding to database
+    '''
+    projects = j().projects()
 
-    result = j().search_issues('project = ' + project_key + ' and summary ~ ' + q)
+    data = []
+    for proj in projects:
+        data.append({
+            'id': proj.id,
+            'url': proj.self,
+            'key': proj.key,
+            'name': proj.name,
+        })
 
-    print(result)
-    print(type(result))
-    return result
+    return data
+
+
+def save_projects_to_db():
+
+    for p in get_all_projects():
+        new_project = Project(
+            url=p['url'],
+            p_key=p['key'],
+            name=p['name'],
+            p_id=p['id'],
+        )
+        new_project.save()

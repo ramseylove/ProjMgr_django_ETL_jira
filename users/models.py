@@ -3,6 +3,7 @@ from django.db import models
 
 from project_manager.models import Project 
 
+
 class CustomUser(AbstractUser):
     projects = models.ManyToManyField(Project)
 
