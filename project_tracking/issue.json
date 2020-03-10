@@ -1,0 +1,25 @@
+payload = json.dumps( {
+    "update": {},
+    "fields": {
+      "summary": "Main order flow broken",
+      "issuetype": {
+        "id": "10000"
+      },
+      "project": {
+        "id": "10000"
+      },
+      "description": {
+        "type": "doc",
+        "version": 1,
+        "content": [
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "text": "Order entry fails when selecting supplier.",
+                "type": "text"
+              }
+            ]
+          }
+        ]
+      },

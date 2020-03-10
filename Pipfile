@@ -16,6 +16,9 @@ arrow = "*"
 requests-oauthlib = "*"
 psycopg2-binary = "*"
 pandas = "*"
+ipython = "*"
+django-bulk-sync = "*"
+django-bulk-update = "*"
 
 [requires]
 python_version = "3.7"

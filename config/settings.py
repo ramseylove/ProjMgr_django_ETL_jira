@@ -48,11 +48,13 @@ INSTALLED_APPS = [
     'django_extensions',
     'jira',
     'arrow',
+    'bulk_sync',
 
     # Local Apps
     'users.apps.UsersConfig',
     'pages.apps.PagesConfig',
     'project_manager.apps.ProjectManagerConfig',
+    'project_tracking.apps.ProjectTrackingConfig',
 ]
 
 MIDDLEWARE = [

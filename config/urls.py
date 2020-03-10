@@ -12,6 +12,7 @@ urlpatterns = [
     path('', LoginView.as_view()),
     path('', include('project_manager.urls')),
     path('', include('tasks.urls')),
+    path('', include('project_tracking.urls'))
 ]
 
 if settings.DEBUG:

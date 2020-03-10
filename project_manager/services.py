@@ -2,7 +2,7 @@ from django.conf import settings
 from jira import JIRA
 import arrow
 
-from .models import Project
+# from .models import Project
 
 
 def j():

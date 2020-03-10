@@ -1,7 +1,7 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
-from project_manager.models import Project 
+from project_tracking.models import Project 
 
 
 class CustomUser(AbstractUser):
