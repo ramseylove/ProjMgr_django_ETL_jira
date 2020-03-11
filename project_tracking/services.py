@@ -30,7 +30,29 @@ def save_projects():
     projects_df = projects_df[['id','key','name','projectCategory.name','projectCategory.id','projectCategory.description']]
     projects_df = projects_df.where(pd.notnull(projects_df), None)
     projects_dict = projects_df.to_dict('records')
-    print(projects_dict)
+    
+    issue_types = json_normalize(data=projects, record_path='issueTypes', meta=['id'], meta_prefix='project_' )
+    issue_types_dataframe = issue_types[['id','name','subtask','project_id']]
+    issue_types_dict = issue_types_dataframe.to_dict('records')
+
+    project_instances = [Project(
+        id = int(record['id']),
+        key = record['key'],
+        name = record['name'],
+        category_id = record['projectCategory.id'],
+        category_name = record['projectCategory.name'],
+        description = record['projectCategory.description']
+    ) for record in projects_dict]
+
+    Project.objects.bulk_create(project_instances)
+
+
+def update_projects_in_db():
+    projects = get_projects()
+    projects_df = json_normalize(projects)
+    projects_df = projects_df[['id','key','name','projectCategory.name','projectCategory.id','projectCategory.description']]
+    projects_df = projects_df.where(pd.notnull(projects_df), None)
+    projects_dict = projects_df.to_dict('records')
     
     issue_types = json_normalize(data=projects, record_path='issueTypes', meta=['id'], meta_prefix='project_' )
     issue_types_dataframe = issue_types[['id','name','subtask','project_id']]
@@ -75,6 +97,30 @@ def save_all_issuetypes_to_db():
 
     IssueTypes.objects.bulk_create(issue_type_instances)
 
+def update_all_issuetypes_to_db():
+    projects = get_projects()
+
+    issue_types = json_normalize(data=projects, record_path='issueTypes', meta=['id'], meta_prefix='project_' )
+    issue_types_dataframe = issue_types[['id','name','subtask','project_id']]
+    issue_types_dict = issue_types_dataframe.to_dict('records')
+
+    issue_type_instances = [IssueTypes(
+        id = int(record['id']),
+        name = record['name'],
+        project = Project.objects.get(id=int(record['project_id']))
+
+    ) for record in issue_types_dict]
+
+    fields = [
+        'id',
+        'name',
+        'project',
+    ]
+    updates = IssueTypes.objects.all().in_bulk()
+
+    if hasattr(issue_type_instances, 'bulk_update') and updates:
+        IssueTypes.objects.bulk_update(updates.values(), fields, batch_size=50)
+
 
 def get_all_issues():
     url = BASE_URL + 'search'
@@ -90,7 +136,8 @@ def get_all_issues():
         'jql': 'project in ({})'.format(ids),
         'fields': [
             'id','self','key','summary','statuscategorychangedate',
-            'issuetype','description','priority','project', 'status','created','updated']
+            'issuetype','description','priority','project', 'status','created','updated'],
+        'max_results': 200,
         }
     
     r = requests.get(url, auth=(USER, TOKEN), params=query)
@@ -99,7 +146,7 @@ def get_all_issues():
 
     return r
 
-def save_issues_to_db():
+def save_all_issues_to_db():
     issues = get_all_issues()
 
     issues_flattened = json_normalize(data=issues, max_level=1, sep='_')
@@ -125,6 +172,53 @@ def save_issues_to_db():
     ) for record in issues_flattened_dict] 
 
     Issue.objects.bulk_create(issue_instances)
+
+def update_all_issues_in_db():
+    issues = get_all_issues()
+
+    issues_flattened = json_normalize(data=issues, max_level=1, sep='_')
+    issues_flattened.where(pd.notnull(issues_flattened), None)
+    issues_flattened_dict = issues_flattened.to_dict('records')
+
+    issue_instances = [Issue(
+        id = int(record['id']),
+        key = record['key'],
+        url = record['self'],
+        summary = record['fields_summary'],
+        description = record['fields_description'],
+        status_change_date = record['fields_statuscategorychangedate'],
+        created_at = record['fields_created'],
+        updated_at = record['fields_updated'],
+        status_id = record['fields_status']['id'],
+        status_name = record['fields_status']['name'],
+        priority_id = record['fields_priority']['id'],
+        priority_name = record['fields_priority']['name'],
+
+        project= Project.objects.get(id=int(record['fields_project']['id'])),
+        issue_type = IssueTypes.objects.get(id=int(record['fields_issuetype']['id'])),
+    ) for record in issues_flattened_dict]
+    
+    fields = [
+        'key',
+        'name',
+        'url',
+        'summary',
+        'description',
+        'status_change_date',
+        'created_at',
+        'updated_at',
+        'status_id',
+        'status_name',
+        'priority_id',
+        'priority_name',
+        'project',
+        'issue_type',
+        
+    ]
+    updates = Issue.objects.all().in_bulk()
+
+    if hasattr(issue_instances, 'bulk_update') and updates:
+        Issue.objects.bulk_update(updates.values(), fields, batch_size=50)
 
 def add_issue_to_jira():
     pass

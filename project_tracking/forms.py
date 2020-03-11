@@ -3,12 +3,14 @@ from django import forms
 from .models import IssueTypes
 
 def get_issue_types(project_id):
+    choices = IssueTypes.objects.get(project_id=)
+
 
 class CreateIssueForm(forms.Form):
 
     def __init__(self, project_key, *args, **kwargs):
         super(CreateIssueForm, self).__init__(*args, **kwargs)
-        self.fields['issue_type'] = forms.ChoiceField(choices=self.issue_type)
+        self.fields['issue_type'] = forms.ChoiceField(choices=)
 
     project = forms.CharField(max_length=10, widget=forms.HiddenInput, required=True)
     summary = forms.CharField(max_length=150, label='Summary', help_text='Summary of issue')

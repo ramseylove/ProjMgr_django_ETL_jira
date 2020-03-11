@@ -3,7 +3,7 @@ from django.views.generic import View, ListView, DetailView, CreateView
 
 from jira import JIRA
 from .models import Project, Issue
-from .services import save_projects, save_all_issuetypes_to_db, save_issues_to_db
+from .services import save_projects, save_all_issuetypes_to_db, save_all_issues_to_db
 
 def load_data_view(request):
 
