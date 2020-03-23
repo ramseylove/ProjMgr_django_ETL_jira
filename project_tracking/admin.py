@@ -2,8 +2,8 @@ from django.contrib import admin
 from django.urls import path
 
 
-from .models import Project, Issue
-from .services import save_projects
+from .models import Project, Issue, IssueTypes
+
 
 class ProjectAdmin(admin.ModelAdmin):
     change_list_template = "users/project_change_list.html"
@@ -56,6 +56,14 @@ class IssueAdmin(admin.ModelAdmin):
         'project',
         'issue_type',
     ]
+class IssueTypesAdmin(admin.ModelAdmin):
+    list_display=(
+        'id',
+        'name',
+        'project',
+
+    )
 
 admin.site.register(Project, ProjectAdmin)
 admin.site.register(Issue, IssueAdmin)
+admin.site.register(IssueTypes, IssueTypesAdmin)

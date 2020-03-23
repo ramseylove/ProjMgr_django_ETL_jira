@@ -15,7 +15,7 @@
                         <div class="ibox-title">
                             <h5>Issue list</h5>
                             <div class="ibox-tools">
-                                <a href="#" class="btn btn-primary btn-xs">Add new issue</a>
+                                <a href=" {% url 'issue_create' issue_project_id %}" class="btn btn-primary btn-xs">Add new issue</a>
                             </div>
                         </div>
                         <div class="ibox-content">
@@ -64,7 +64,7 @@
                                             {{ issue.updated_at }}
                                         </td>
                                         <td>
-                                            <button class="btn btn-white btn-xs"> {{ issue.issuetype }}</button>
+                                            <button class="btn btn-white btn-xs"> {{ issue.issue_type }}</button>
                                         </td>
                                     </tr>
                                     {% endfor %}

@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.sites',
+    'django.contrib.postgres',
 
     # Third-party
     'allauth',
@@ -48,7 +49,7 @@ INSTALLED_APPS = [
     'django_extensions',
     'jira',
     'arrow',
-    'bulk_sync',
+    'psqlextra',
 
     # Local Apps
     'users.apps.UsersConfig',
@@ -97,12 +98,14 @@ DATABASES = {
     'default': {
         # 'ENGINE': 'django.db.backends.sqlite3',
         # 'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-        'ENGINE': 'django.db.backends.postgresql',
+        # 'ENGINE': 'django.db.backends.postgresql',
+        'ENGINE': 'psqlextra.backend',
         'NAME': 'atria_db',
-        'USER': 'postgres',
+        'USER': 'db_user',
         'PASSWORD': 'postgres',
-        'HOST': 'docker.for.mac.localhost',
-        'PORT': 6543
+        # 'HOST': 'docker.for.mac.localhost',
+        'HOST': 'db',
+        'PORT': 5432
 
     }
 }
@@ -176,7 +179,7 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 
 # Django-Allauth Config
-LOGIN_REDIRECT_URL = 'projects'
+LOGIN_REDIRECT_URL = 'project_list'
 ACCOUNT_LOGOUT_REDIRECT_URL = 'account_login'
 
 AUTHENTICATION_BACKENDS = (
@@ -219,3 +222,11 @@ if ENVIRONMENT == 'production':
     SESSION_COOKIE_SECURE = True
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
     SECURE_REFERRER_POLICY = 'no-referrer-when-downgrade'
+
+NOTEBOOK_ARGUMENTS = [
+    '--ip', '0.0.0.0',
+    '--port', '8888'
+]
+SHELL_PLUS_PRE_IMPORTS = [
+    ('project_tracking.services', '*')
+]

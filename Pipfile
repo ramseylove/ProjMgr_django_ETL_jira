@@ -17,8 +17,7 @@ requests-oauthlib = "*"
 psycopg2-binary = "*"
 pandas = "*"
 ipython = "*"
-django-bulk-sync = "*"
-django-bulk-update = "*"
+django-postgres-extra = "*"
 
 [requires]
 python_version = "3.7"

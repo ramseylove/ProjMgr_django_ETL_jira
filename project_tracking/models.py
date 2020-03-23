@@ -1,6 +1,7 @@
 from django.db import models
+from psqlextra.models import PostgresModel
 
-class Project(models.Model):
+class Project(PostgresModel):
     id = models.IntegerField(primary_key=True, unique=True)
     key = models.CharField(max_length=20, unique=True)
     name = models.CharField(max_length=155)
@@ -12,7 +13,7 @@ class Project(models.Model):
         return self.name
 
 
-class Issue(models.Model):
+class Issue(PostgresModel):
     id = models.IntegerField(primary_key=True, unique=True)
     key = models.CharField(max_length=10)
     url = models.URLField()
@@ -27,17 +28,17 @@ class Issue(models.Model):
     priority_name = models.CharField(max_length=40)
 
     project = models.ForeignKey('project_tracking.Project', on_delete=models.CASCADE)
-    issue_type = models.ForeignKey('project_tracking.IssueTypes', null=True, on_delete=models.SET_NULL)
+    issue_type = models.ForeignKey('project_tracking.IssueTypes', on_delete=models.CASCADE)
 
     def __str__(self):
         return self.key
 
 
-class IssueTypes(models.Model):
+class IssueTypes(PostgresModel):
     id = models.IntegerField(primary_key=True, unique=True)
     name = models.CharField(max_length=100)
 
-    project = models.ForeignKey('project_tracking.Project', null=True, on_delete=models.SET_NULL)
+    project = models.ForeignKey('project_tracking.Project', null=True, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.name

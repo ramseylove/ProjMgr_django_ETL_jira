@@ -1,46 +1,22 @@
+from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404, render
 from django.views.generic import View, ListView, DetailView, CreateView
 
-from jira import JIRA
-from .models import Project, Issue
-from .services import save_projects, save_all_issuetypes_to_db, save_all_issues_to_db
 
-def load_data_view(request):
 
-    return render(request, 'project_tracking/test.html')
+from .models import Project, Issue, IssueTypes
+from .forms import CreateIssueForm
+from .services import jira, create_issue, save_issue_to_db
 
-def load_projects_view(request):
-    projects = save_projects()
 
-    context = {
-        'projects': projects
-    }
-
-    return render(request, 'project_tracking/test.html', context)
-
-def load_issue_types_view(request):
-    issue_types = save_all_issuetypes_to_db()
-
-    context = {
-        'issue_types': issue_types
-    }
-
-    return render(request, 'project_tracking/test.html', context)
-
-def load_issues_view(request):
-    save_issues_to_db()
-    issues = Issue.objects.all()
-
-    context = {
-        'issues': issues
-    }
-
-    return render(request, 'project_tracking/test.html', context)
 
 class ProjectListView(ListView):
     model = Project
     template_name = 'project_tracking/project_list.html'
     context_object_name = 'projects'
+
+    def get_queryset(self):
+        return super(ProjectListView, self).get_queryset().filter(customuser=self.request.user)
 
 
 class IssueListView(ListView):
@@ -51,35 +27,63 @@ class IssueListView(ListView):
     def get_queryset(self):
         return super(IssueListView, self).get_queryset().filter(project_id=self.kwargs['project_id'])
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['issue_project_id'] = self.kwargs['project_id']
+
+        return context
+
+
 class IssueDetailView(DetailView):
     model = Issue
     template_name = 'project_tracking/issue_detail.html'
     context_object_name = 'issue'
 
+# class IssueCreateView(CreateView):
+#     model = Issue
+#     template_name = 'project_tracking/issue_create.html'
+#     fields = ['issue_type','summary','description',]
+   
+
 class IssueCreateView(View):
 
     def get(self, request, *args, **kwargs):
+        project_id = self.kwargs['project_id']
+        project = Project.objects.get(id=project_id)
         initial = {
-            'project': self.project_id
+            'project_id': project_id,
         }
+        form = CreateIssueForm(project_id, initial=initial)
+        context = {
+            'form': form,
+            'project': project,
+            }
+        return render(request, 'project_tracking/issue_create.html', context)
 
-        form = CreateIssueForm(project_key, initial=initial)
-        context = {'form': form}
-        return render(request, 'project_manager/issue_create.html', context)
-
-    def post(self, request, project_key, *args, **kwargs):
-        form = CreateIssueForm(project_key, data=request.POST)
+    def post(self, request,  *args, **kwargs):
+        form = CreateIssueForm(data=request.POST)
+        # project_id = self.kwargs['project_id']
 
         if form.is_valid():
             issue = {
-                'project': {'key': form.cleaned_data['project']},
+                'project': {'id': form.cleaned_data['project'] },
                 'summary': form.cleaned_data['summary'],
                 'description': form.cleaned_data['description'],
-                'issuetype': {'name': form.cleaned_data['issuetype']},
+                'issuetype': {'name': form.cleaned_data['issue_type']},
             }
             new_issue = create_issue(issue)
-            print(new_issue)
-            return redirect('issues', issue['project']['key'])
+            
+            if new_issue:
+                new_issue = create_issue(issue)
+                save_issue_to_db(new_issue.id)
+                return HttpResponseRedirect(reverse_lazy)
+            else:
+                return render(request, 'project_tracking/issue_create.html', context)
+                
+        return render(request, 'project_tracking/issue_create.html', context)
+            
+            
+             
             # if new_issue:
             #     return redirect('issue-detail', project_key=issue.project['key'], issue_key=new_issue)
             # else:

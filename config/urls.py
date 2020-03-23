@@ -10,8 +10,8 @@ urlpatterns = [
     path('users/', include('django.contrib.auth.urls')),
     path('accounts/', include('allauth.urls')),
     path('', LoginView.as_view()),
-    path('', include('project_manager.urls')),
-    path('', include('tasks.urls')),
+    # path('', include('project_manager.urls')),
+    # path('', include('tasks.urls')),
     path('', include('project_tracking.urls'))
 ]
 

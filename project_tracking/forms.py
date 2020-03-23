@@ -1,18 +1,29 @@
 from django import forms
+from django.forms import ModelForm
+from django.contrib.auth import get_user_model
 
-from .models import IssueTypes
+from .models import IssueTypes, Issue, Project
 
-def get_issue_types(project_id):
-    choices = IssueTypes.objects.get(project_id=)
+# def get_issue_types(project_id):
+#     choices = IssueTypes.objects.get(project_id=)
 
 
-class CreateIssueForm(forms.Form):
+class CreateIssueForm(ModelForm):
 
-    def __init__(self, project_key, *args, **kwargs):
+    def __init__(self, product_id, *args, **kwargs):
         super(CreateIssueForm, self).__init__(*args, **kwargs)
-        self.fields['issue_type'] = forms.ChoiceField(choices=)
+        self.fields['issue_type'].queryset = IssueTypes.objects.filter(project_id=product_id)
 
-    project = forms.CharField(max_length=10, widget=forms.HiddenInput, required=True)
-    summary = forms.CharField(max_length=150, label='Summary', help_text='Summary of issue')
-    description = forms.CharField(max_length=600, help_text='Describe the issue', widget=forms.Textarea, required=False)
-    issuetype = forms.ChoiceField()
+    project = forms.ModelChoiceField(
+        # widget=forms.HiddenInput,
+        queryset=get_user_model().projects.all(),
+        disabled=True
+    )
+
+    class Meta:
+        model = Issue
+        fields = ['summary', 'description', 'issue_type','project']
+        widgets = {
+            'project': forms.HiddenInput(),
+        }
+    
