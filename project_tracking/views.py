@@ -7,6 +7,8 @@ from django.views.generic import View, ListView, DetailView, CreateView
 from .models import Project, Issue, IssueTypes
 from .forms import CreateIssueForm
 from .services import jira, create_issue, save_issue_to_db
+from django.http import HttpResponseRedirect
+from django.urls import reverse_lazy
 
 
 
@@ -51,9 +53,9 @@ class IssueCreateView(View):
         project_id = self.kwargs['project_id']
         project = Project.objects.get(id=project_id)
         initial = {
-            'project_id': project_id,
+            'project': project,
         }
-        form = CreateIssueForm(project_id, initial=initial)
+        form = CreateIssueForm(request, project_id, initial=initial)
         context = {
             'form': form,
             'project': project,
@@ -61,15 +63,15 @@ class IssueCreateView(View):
         return render(request, 'project_tracking/issue_create.html', context)
 
     def post(self, request,  *args, **kwargs):
-        form = CreateIssueForm(data=request.POST)
-        # project_id = self.kwargs['project_id']
+        project_id = self.kwargs['project_id']
+        form = CreateIssueForm(request, project_id, data=request.POST)
 
         if form.is_valid():
             issue = {
-                'project': {'id': form.cleaned_data['project'] },
+                'project': {'id': project_id }, #f orm.cleaned_data['project']
                 'summary': form.cleaned_data['summary'],
                 'description': form.cleaned_data['description'],
-                'issuetype': {'name': form.cleaned_data['issue_type']},
+                'issuetype': {'id': form.cleaned_data['issue_type']},
             }
             new_issue = create_issue(issue)
             
@@ -78,9 +80,9 @@ class IssueCreateView(View):
                 save_issue_to_db(new_issue.id)
                 return HttpResponseRedirect(reverse_lazy)
             else:
-                return render(request, 'project_tracking/issue_create.html', context)
+                return render(request, 'project_tracking/issue_create.html', {'form':form})
                 
-        return render(request, 'project_tracking/issue_create.html', context)
+        return render(request, 'project_tracking/issue_create.html', {'form':form})
             
             
              

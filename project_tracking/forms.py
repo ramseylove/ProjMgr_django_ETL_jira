@@ -6,24 +6,19 @@ from .models import IssueTypes, Issue, Project
 
 # def get_issue_types(project_id):
 #     choices = IssueTypes.objects.get(project_id=)
-
+UserModel = get_user_model()
 
 class CreateIssueForm(ModelForm):
 
-    def __init__(self, product_id, *args, **kwargs):
+    def __init__(self, request, project_id, *args, **kwargs):
         super(CreateIssueForm, self).__init__(*args, **kwargs)
-        self.fields['issue_type'].queryset = IssueTypes.objects.filter(project_id=product_id)
+        user = request.user
+        self.fields['issue_type'].queryset = IssueTypes.objects.filter(project_id=project_id)
+        self.fields['project'].queryset = user.projects.all()
 
-    project = forms.ModelChoiceField(
-        # widget=forms.HiddenInput,
-        queryset=get_user_model().projects.all(),
-        disabled=True
-    )
+
 
     class Meta:
         model = Issue
-        fields = ['summary', 'description', 'issue_type','project']
-        widgets = {
-            'project': forms.HiddenInput(),
-        }
+        fields = ['project','summary', 'description', 'issue_type']
     

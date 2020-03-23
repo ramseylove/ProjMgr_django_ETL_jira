@@ -260,7 +260,7 @@ def save_issue_to_db(id):
 
 def create_issue(issue):
 
-    new_issue = j().create_issue(fields=issue)
+    new_issue = jira().create_issue(fields=issue)
     print(new_issue)
 
     return new_issue
