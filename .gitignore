@@ -1,8 +1,9 @@
 ## ignore system created files
 .DS_Store
 
-## ignore vscode settings
+## ignore editor settings
 .vscode/
+.idea/
 
 ## ignore sqlite database
 db.sqlite3

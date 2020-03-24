@@ -85,8 +85,14 @@ class IssueCreateView(View):
             
             
 class IssueUpdateView(UpdateView):
-    project_id = request.kwargs['project_id']
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['issue_project_id'] = self.kwargs['project_id']
+
+        return context
+
     model = Issue
     form = EditIssueForm(project_id)
     context_object_name = 'issue'
-    pk_url_kwarg = 'issue_pk'
+
