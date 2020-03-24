@@ -223,7 +223,7 @@ def add_issue_to_jira():
 
 
 def get_issue(id):
-    url = BASE_URL + 'issue/' + int(id)
+    url = BASE_URL + 'issue/' + str(id)
     
     r = requests.get(url, auth=(USER, TOKEN))
     r = r.json()
@@ -235,8 +235,9 @@ def save_issue_to_db(id):
     issue = get_issue(id)
 
     issue_flattened = json_normalize(data=issue, max_level=1, sep='_')
-    issue_flattened.where(pd.notnull(issue_flattened), None)
-    issue_flattened_dict = issues_flattened.to_dict('records')
+    issues_flattened = issue_flattened.where(pd.notnull(issue_flattened), None)
+    record = issues_flattened.to_dict('records')
+    record = record[0]
 
     issue_instance = Issue(
         id = int(record['id']),
@@ -254,9 +255,9 @@ def save_issue_to_db(id):
 
         project= Project.objects.get(id=int(record['fields_project']['id'])),
         issue_type = IssueTypes.objects.get(id=int(record['fields_issuetype']['id'])),
-    )
-
-    Issue.object.create(issue_instance)
+    ).save()
+    
+    return issue_instance
 
 def create_issue(issue):
 

@@ -16,7 +16,16 @@ class CreateIssueForm(ModelForm):
         self.fields['issue_type'].queryset = IssueTypes.objects.filter(project_id=project_id)
         self.fields['project'].queryset = user.projects.all()
 
+    class Meta:
+        model = Issue
+        fields = ['project','summary', 'description', 'issue_type']
 
+
+class EditIssueForm(ModelForm):
+
+    def __init__(self, project_id, *args, **kwargs):
+        super(EditIssueForm, self).__init__(*args, **kwargs)
+        self.fields['issue_type'].queryset = IssueTypes.objects.filter(project_id=project_id)
 
     class Meta:
         model = Issue

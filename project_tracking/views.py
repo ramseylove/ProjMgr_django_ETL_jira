@@ -1,11 +1,11 @@
 from django.contrib.auth import get_user_model
-from django.shortcuts import get_object_or_404, render
-from django.views.generic import View, ListView, DetailView, CreateView
+from django.shortcuts import get_object_or_404, render, redirect
+from django.views.generic import View, ListView, DetailView, CreateView, UpdateView
 
 
 
 from .models import Project, Issue, IssueTypes
-from .forms import CreateIssueForm
+from .forms import CreateIssueForm, EditIssueForm
 from .services import jira, create_issue, save_issue_to_db
 from django.http import HttpResponseRedirect
 from django.urls import reverse_lazy
@@ -66,27 +66,27 @@ class IssueCreateView(View):
         project_id = self.kwargs['project_id']
         form = CreateIssueForm(request, project_id, data=request.POST)
 
-        if form.is_valid():
-            issue = {
-                'project': {'id': project_id }, #f orm.cleaned_data['project']
-                'summary': form.cleaned_data['summary'],
-                'description': form.cleaned_data['description'],
-                'issuetype': {'id': form.cleaned_data['issue_type']},
+        issue = {
+                'project': {'id': project_id }, #form.cleaned_data['project']
+                'summary': form['summary'].value(),
+                'description': form['description'].value(),
+                'issuetype': {'id': form['issue_type'].value()},
             }
-            new_issue = create_issue(issue)
+        
+        new_issue = create_issue(issue)
             
-            if new_issue:
-                new_issue = create_issue(issue)
-                save_issue_to_db(new_issue.id)
-                return HttpResponseRedirect(reverse_lazy)
-            else:
-                return render(request, 'project_tracking/issue_create.html', {'form':form})
+        if new_issue:
+            save_issue_to_db(str(new_issue.id))
+            return redirect('issue_detail', pk=new_issue.id)
+        else:
+            return render(request, 'project_tracking/issue_create.html', {'form':form})
                 
         return render(request, 'project_tracking/issue_create.html', {'form':form})
             
             
-             
-            # if new_issue:
-            #     return redirect('issue-detail', project_key=issue.project['key'], issue_key=new_issue)
-            # else:
-            #     return render(request, 'project_manager/issue_create.html', {'form': form})
+class IssueUpdateView(UpdateView):
+    project_id = request.kwargs['project_id']
+    model = Issue
+    form = EditIssueForm(project_id)
+    context_object_name = 'issue'
+    pk_url_kwarg = 'issue_pk'
