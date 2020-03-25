@@ -28,7 +28,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.IntegerField(primary_key=True, serialize=False, unique=True)),
                 ('name', models.CharField(max_length=100)),
-                ('project_id', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, to='project_tracking.Project')),
+                ('project', models.ForeignKey(on_delete=django.db.models.deletion.SET_NULL, to='project_tracking.Project')),
             ],
         ),
         migrations.CreateModel(
@@ -46,8 +46,8 @@ class Migration(migrations.Migration):
                 ('status_name', models.CharField(max_length=30)),
                 ('priority_id', models.IntegerField()),
                 ('priority_name', models.CharField(max_length=40)),
-                ('issue_type_id', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, to='project_tracking.IssueTypes')),
-                ('project_id', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='project_tracking.Project')),
+                ('issue_type', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, to='project_tracking.IssueTypes')),
+                ('project', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='project_tracking.Project')),
             ],
         ),
     ]

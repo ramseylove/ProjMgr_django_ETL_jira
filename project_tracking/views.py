@@ -1,15 +1,13 @@
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404, render, redirect
-from django.views.generic import View, ListView, DetailView, CreateView, UpdateView
-
+from django.views.generic import View, ListView, DetailView, CreateView, UpdateView, FormView
 
 
 from .models import Project, Issue, IssueTypes
 from .forms import CreateIssueForm, EditIssueForm
-from .services import jira, create_issue, save_issue_to_db
+from .services import jira, create_issue, save_issue_to_db, update_issue
 from django.http import HttpResponseRedirect
 from django.urls import reverse_lazy
-
 
 
 class ProjectListView(ListView):
@@ -84,15 +82,33 @@ class IssueCreateView(View):
         return render(request, 'project_tracking/issue_create.html', {'form':form})
             
             
-class IssueUpdateView(UpdateView):
+class IssueUpdateView(FormView):
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['issue_project_id'] = self.kwargs['project_id']
+    def get(self, request, *args, **kwargs):
+        project_id = self.kwargs['project_id']
+        issue_pk = self.kwargs['issue_pk']
+        issue = Issue.objects.get(pk=issue_pk)
+        form = EditIssueForm(project_id, instance=issue)
 
-        return context
+        context = {
+            'form': form,
+            }
+        return render(request, 'project_tracking/issue_create.html', context)
 
-    model = Issue
-    form = EditIssueForm(project_id)
-    context_object_name = 'issue'
+    def post(self, request, *args, **kwargs):
+        form = EditIssueForm(data=request.POST)
+
+        issue = {
+            'summary': form['summary'].value(),
+            'description': form['description'].value(),
+            'issuetype': {'id': form['issue_type'].value()},
+        }
+
+        updated_issue = update_issue(form['id'].value(), issue)
+
+        if updated_issue && form.is_valid():
+            form.save()
+
+        HttpResponseRedirect('issue_detail', arg)
+
 

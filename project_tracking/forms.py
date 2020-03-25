@@ -8,6 +8,7 @@ from .models import IssueTypes, Issue, Project
 #     choices = IssueTypes.objects.get(project_id=)
 UserModel = get_user_model()
 
+
 class CreateIssueForm(ModelForm):
 
     def __init__(self, request, project_id, *args, **kwargs):
@@ -29,5 +30,5 @@ class EditIssueForm(ModelForm):
 
     class Meta:
         model = Issue
-        fields = ['project','summary', 'description', 'issue_type']
+        fields = ['id', 'project', 'summary', 'description', 'issue_type']
     

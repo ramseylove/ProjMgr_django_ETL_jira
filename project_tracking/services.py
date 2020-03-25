@@ -266,4 +266,13 @@ def create_issue(issue):
 
     return new_issue
 
+
+def update_issue(issue_key, data):
+    jira_issue = jira().issue(issue_key, fields='summary,issuetype,description')
+
+    response = jira_issue.update(fields=data)
+
+    print(response)
+    return response
+
     
