@@ -1,5 +1,7 @@
 from django.db import models
+from django.urls import reverse
 from psqlextra.models import PostgresModel
+
 
 class Project(PostgresModel):
     id = models.IntegerField(primary_key=True, unique=True)
@@ -12,6 +14,9 @@ class Project(PostgresModel):
     def __str__(self):
         return self.name
 
+    def get_absolute_url(self):
+        return reverse('issue_list', args=[str(self.id)])
+
 
 class Issue(PostgresModel):
     id = models.IntegerField(primary_key=True, unique=True)
@@ -22,7 +27,7 @@ class Issue(PostgresModel):
     status_change_date = models.DateTimeField()
     created_at = models.DateTimeField()
     updated_at = models.DateTimeField()
-    status_id =  models.IntegerField()
+    status_id = models.IntegerField()
     status_name = models.CharField(max_length=30)
     priority_id = models.IntegerField()
     priority_name = models.CharField(max_length=40)
@@ -32,6 +37,9 @@ class Issue(PostgresModel):
 
     def __str__(self):
         return self.key
+
+    def get_absolute_url(self):
+        return reverse('issue_detail', args=[str(self.id)])
 
 
 class IssueTypes(PostgresModel):

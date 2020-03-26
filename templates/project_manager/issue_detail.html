@@ -2,7 +2,15 @@
 {% block content %}
 <div class="row wrapper border-bottom white-bg page-heading">
         <div class="col-sm-4">
-            <h2>Issue detail</h2>
+            <h2>Issue Edit</h2>
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item">
+                    <a href="{% url 'projects' %}">Projects</a>
+                </li>
+                <li class="breadcrumb-item active">
+                    <a href="#"><strong>Issue list</strong></a>
+                </li>
+            </ol>
         </div>
     </div>
     <div class="wrapper wrapper-content animated fadeInUp">

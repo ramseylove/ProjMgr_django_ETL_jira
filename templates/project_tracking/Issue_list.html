@@ -4,7 +4,15 @@
             <!--Page content-->
             <div class="row wrapper border-bottom white-bg page-heading">
                 <div class="col-lg-10">
-                    <h2>Issue list</h2>
+                    <h2>{{ project.name }}</h2>
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item">
+                            <a href="{% url 'project_list' %}">Projects</a>
+                        </li>
+                        <li class="breadcrumb-item active">
+                            <strong>Issue list</strong>
+                        </li>
+                    </ol>
                 </div>
             </div>
 
@@ -58,7 +66,7 @@
                                         </td>
                                         <td class="issue-info">
                                             <a href="{% url 'issue_detail' issue.id %}">{{ issue.key }}</a>
-                                            <small>{{ issue.summary }}</small>
+                                            <small>{{ issue.summary|truncatechars_html:30 }}</small>
                                         </td>
                                         <td>
                                             {{ issue.updated_at }}
