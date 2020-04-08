@@ -6,11 +6,11 @@ from django.urls import reverse, resolve
 class CustomUserTest(TestCase):
 
     def test_create_user(self):
-        User = get_user_model()
-        user = User.objects.create_user(
-            username = 'ryguy',
-            email = 'meyeryan@gmail.com',
-            password='testpass123'
+        user = get_user_model()
+        user = user.objects.create_user(
+            username='ryguy',
+            email='meyeryan@gmail.com',
+            password='testpass123',
         )
         self.assertEqual(user.username, 'ryguy')
         self.assertEqual(user.email, 'meyeryan@gmail.com')

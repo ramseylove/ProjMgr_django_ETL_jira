@@ -6,7 +6,7 @@ from django.views.generic import View, ListView, DetailView, FormView
 
 from .models import Project, Issue
 from .forms import CreateIssueForm, EditIssueForm
-from .services import create_issue, save_issue_to_db, update_issue
+from .services import create_issue, save_issue_to_db, update_issue, get_issue_comments
 
 
 class ProjectListView(LoginRequiredMixin, ListView):
@@ -38,6 +38,10 @@ class IssueDetailView(LoginRequiredMixin, DetailView):
     model = Issue
     template_name = 'project_tracking/issue_detail.html'
     context_object_name = 'issue'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['comments'] = get_issue_comments()
    
 
 class IssueCreateView(LoginRequiredMixin, View):
@@ -74,10 +78,8 @@ class IssueCreateView(LoginRequiredMixin, View):
             return redirect('issue_detail', pk=new_issue.id)
         else:
             messages.error(request, "Issue was not created, Please correct any issue")
-            return render(request, 'project_tracking/issue_create.html', {'form':form})
-                
-        return render(request, 'project_tracking/issue_create.html', {'form':form})
-            
+            return render(request, 'project_tracking/issue_create.html', {'form': form})
+
             
 class IssueUpdateView(LoginRequiredMixin, FormView):
 
@@ -94,18 +96,24 @@ class IssueUpdateView(LoginRequiredMixin, FormView):
 
     def post(self, request, *args, **kwargs):
         project_id = self.kwargs['project_id']
-        form = EditIssueForm(project_id, data=request.POST)
+        project = Project.objects.get(id=project_id)
+        issue_pk = self.kwargs['issue_pk']
+        issue = Issue.objects.get(pk=issue_pk)
+        form = EditIssueForm(project_id, data=request.POST, instance=issue)
 
-        issue = {
+        new_issue = {
             'summary': form['summary'].value(),
             'description': form['description'].value(),
             'issuetype': {'id': form['issue_type'].value()},
         }
-        issue_id = form['id'].value()
-        updated_issue = update_issue(form['id'].value(), issue)
 
-        if updated_issue and form.is_valid():
-            form.save()
+        updated_issue = update_issue(issue_pk, new_issue)
+        print(updated_issue)
 
-        return redirect('issue_detail', pk=issue_id)
+        if updated_issue:
+            return redirect('issue_detail', pk=issue_pk)
+        else:
+            return render(request, 'project_tracking/issue_create.html', {'form': form})
+
+        return render(request, 'project_tracking/issue_create.html', {'form': form})
 

@@ -1,9 +1,10 @@
 from django.db import models
 from django.urls import reverse
-from psqlextra.models import PostgresModel
+from prosemirror.fields import ProseMirrorField
+from django.template.defaultfilters import slugify
 
 
-class Project(PostgresModel):
+class Project(models.Model):
     id = models.IntegerField(primary_key=True, unique=True)
     key = models.CharField(max_length=20, unique=True)
     name = models.CharField(max_length=155)
@@ -18,12 +19,12 @@ class Project(PostgresModel):
         return reverse('issue_list', args=[str(self.id)])
 
 
-class Issue(PostgresModel):
+class Issue(models.Model):
     id = models.IntegerField(primary_key=True, unique=True)
     key = models.CharField(max_length=10)
     url = models.URLField()
     summary = models.CharField(max_length=300)
-    description = models.TextField(null=True)
+    description = ProseMirrorField(prosemirror_profile="maxi", null=True, blank=True)
     status_change_date = models.DateTimeField()
     created_at = models.DateTimeField()
     updated_at = models.DateTimeField()
@@ -34,6 +35,7 @@ class Issue(PostgresModel):
 
     project = models.ForeignKey('project_tracking.Project', on_delete=models.CASCADE)
     issue_type = models.ForeignKey('project_tracking.IssueTypes', on_delete=models.CASCADE)
+    # user = models.ForeignKey('user.CustomUser', null=True, on_delete=models.SET_NULL())
 
     def __str__(self):
         return self.key
@@ -42,7 +44,7 @@ class Issue(PostgresModel):
         return reverse('issue_detail', args=[str(self.id)])
 
 
-class IssueTypes(PostgresModel):
+class IssueTypes(models.Model):
     id = models.IntegerField(primary_key=True, unique=True)
     name = models.CharField(max_length=100)
 
@@ -50,4 +52,18 @@ class IssueTypes(PostgresModel):
 
     def __str__(self):
         return self.name
+
+
+class IssueImages(models.Model):
+    id = models.IntegerField(primary_key=True, unique=True)
+    filename = models.CharField(max_length=255)
+    content = models.URLField()
+    thumbnail = models.URLField()
+    image = models.ImageField(verbose_name='Screenshot')
+
+    issue = models.ForeignKey('project_tracking.Issue', on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.content
+
 

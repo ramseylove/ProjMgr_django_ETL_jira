@@ -47,14 +47,12 @@ INSTALLED_APPS = [
     'crispy_forms',
     'debug_toolbar',
     'django_extensions',
-    'jira',
     'arrow',
-    'psqlextra',
+    'prosemirror',
 
     # Local Apps
     'users.apps.UsersConfig',
     'pages.apps.PagesConfig',
-    'project_manager.apps.ProjectManagerConfig',
     'project_tracking.apps.ProjectTrackingConfig',
 ]
 
@@ -98,18 +96,18 @@ DATABASES = {
     'default': {
         # 'ENGINE': 'django.db.backends.sqlite3',
         # 'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-        # 'ENGINE': 'django.db.backends.postgresql',
-        'ENGINE': 'psqlextra.backend',
+        'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'atria_db',
-        'USER': 'db_user',
-        'PASSWORD': 'postgres',
-        # 'HOST': 'docker.for.mac.localhost',
-        'HOST': 'db',
+        'USER': 'atria_db',
+        'PASSWORD': 'dgrx7tWdL15ayb9Am3Bm',
+        'HOST': '192.168.0.177',
         'PORT': 5432
 
     }
 }
 
+# Define the broker url
+CELERY_BROKER_URL = "amqp://rabbitmq"
 
 # Password validation
 # https://docs.djangoproject.com/en/2.2/ref/settings/#auth-password-validators
@@ -223,10 +221,7 @@ if ENVIRONMENT == 'production':
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
     SECURE_REFERRER_POLICY = 'no-referrer-when-downgrade'
 
-NOTEBOOK_ARGUMENTS = [
-    '--ip', '0.0.0.0',
-    '--port', '8888'
-]
+
 SHELL_PLUS_PRE_IMPORTS = [
     ('project_tracking.services', '*')
 ]

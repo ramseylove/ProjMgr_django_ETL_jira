@@ -1,25 +1,26 @@
 from django.conf import settings
-from IPython.core.debugger import set_trace
 import pandas as pd
 from pandas import json_normalize
-from psqlextra.query import ConflictAction
 import requests
 from jira import JIRA
-from .models import Project, Issue, IssueTypes
+from .models import Project, Issue, IssueTypes, IssueImages
+from django.db import DatabaseError
 
 
-BASE_URL = 'https://atriadev.atlassian.net/rest/api/3/'
+BASE_URL = 'https://atriadev.atlassian.net/rest/api/2/'
 TOKEN = settings.JIRA_KEY
 USER = settings.JIRA_USER
+
 
 def jira():
     """
     Connects to jira cloud returns connection
     """
-    options = {"server": settings.JIRA_URL }
+    options = {"server": settings.JIRA_URL}
     j = JIRA(options, basic_auth=(settings.JIRA_USER, settings.JIRA_KEY))
 
     return j
+
 
 def get_projects():
     url = BASE_URL + 'project/search'
@@ -35,17 +36,15 @@ def get_projects():
     return r
 
 
-def update_projects_in_db():
-    projects = get_projects()
+def update_projects_in_db(projects):
+
     projects_df = json_normalize(projects)
-    projects_df = projects_df[['id','key','name','projectCategory.name','projectCategory.id','projectCategory.description']]
+    projects_df = projects_df[['id', 'key', 'name', 'projectCategory.name', 'projectCategory.id', 'projectCategory.description']]
     projects_df = projects_df.where(pd.notnull(projects_df), None)
 
     db_keys = Project.objects.values_list('key', flat=True)
     update_projects_df = projects_df[projects_df[projects_df.columns[1]].isin(db_keys)]
     create_projects_df = projects_df[~projects_df[projects_df.columns[1]].isin(db_keys)]
-    print(update_projects_df)
-    print(create_projects_df)
 
     def dataframe_assignment(df):
         
@@ -68,23 +67,24 @@ def update_projects_in_db():
         'category_name',
         'description',
     ]
+    if not create_projects_df.empty:
+        Project.objects.bulk_create(dataframe_assignment(create_projects_df))
+        print('New Projects Created')
+    try:
+        Project.objects.bulk_update(dataframe_assignment(update_projects_df), fields, batch_size=50)
+    except DatabaseError:
+        print('There was an issue while updating projects')
 
-    Project.objects.bulk_update(dataframe_assignment(update_projects_df), fields, batch_size=50)
-    Project.objects.bulk_create(dataframe_assignment(create_projects_df))
-    
 
-def update_all_issuetypes_to_db():
-    projects = get_projects()
+def update_all_issuetypes_to_db(projects):
 
     issue_types_df = json_normalize(data=projects, record_path='issueTypes', meta=['id'], meta_prefix='project_' )
     issue_types_df = issue_types_df.set_index("id", drop = False)
     issue_types_df = issue_types_df[['id','name','project_id']]
 
     db_ids = IssueTypes.objects.values_list('id', flat=True)
-    update_issue_types_df = issue_types_df[issue_types_df[issue_types_df.columns[0]].isin(db_ids)]
-    create_issue_types_df = issue_types_df[~issue_types_df[issue_types_df.columns[0]].isin(db_ids)]
-    print(update_issue_types_df)
-    print(create_issue_types_df)
+    create_issue_types_df = issue_types_df[issue_types_df[issue_types_df.columns[0]].isin(db_ids)]
+    update_issue_types_df = issue_types_df[~issue_types_df[issue_types_df.columns[0]].isin(db_ids)]
 
     def dataframe_assignment(df):
         records = df.to_dict('records')
@@ -101,9 +101,14 @@ def update_all_issuetypes_to_db():
         'name',
         'project',
     ]
-    
-    IssueTypes.objects.bulk_update(dataframe_assignment(update_issue_types_df), fields, batch_size=50)
-    IssueTypes.objects.bulk_create(dataframe_assignment(create_issue_types_df))
+    if not create_issue_types_df.empty:
+        IssueTypes.objects.bulk_create(dataframe_assignment(create_issue_types_df))
+        print('New Issue Types Added')
+    try:
+        IssueTypes.objects.bulk_update(dataframe_assignment(update_issue_types_df), fields, batch_size=50)
+        return 'IssueTypes updated Succesfully'
+    except DatabaseError:
+        print('There was an issue while updating projects')
 
 
 def get_all_project_ids():
@@ -116,88 +121,87 @@ def get_all_project_ids():
     ids = str(id_list).strip('[]')
 
     return ids
-      
 
-def get_issues(ids):
+
+def get_all_issues():
     '''Make the intial query'''
-    def make_query(ids, max_results=100, start_at=0):
-        
+    proj_ids = get_all_project_ids()
+
+    def make_query(project_ids, max_results=100, start_at=0):
+
         url = BASE_URL + 'search'
-    
+
         query = {
-            'jql': 'project in ({})'.format(ids),
+            'jql': 'project in ({})'.format(project_ids),
             'fields': [
-                'id','self','key','summary','statuscategorychangedate',
-                'issuetype','description','priority','project', 'status','created','updated'],
+                'id', 'self', 'key', 'summary', 'statuscategorychangedate',
+                'issuetype', 'description', 'priority', 'project', 'status', 'created', 'updated', 'attachment'],
             'maxResults': max_results,
             'startAt': start_at,
-            }
+        }
 
         r = requests.get(url, auth=(USER, TOKEN), params=query)
         r = r.json()
-        
+
         return r
-    
-    results = make_query(ids)
-    
+
+    results = make_query(proj_ids)
+
     total = results['total']
     issues = results['issues']
-    
+
     if total > 100:
         paged_results = 0
         total_results = (total - 100)
-        
+
         while total_results > 100:
             paged_results += 100
-            results = make_query(ids, start_at=paged_results)
+            results = make_query(proj_ids, start_at=paged_results)
             issues.extend(results['issues'])
             total_results -= 100
             print(len(issues))
         else:
             paged_results += 100
-            results = make_query(ids, max_results=total_results, start_at=paged_results)
+            results = make_query(proj_ids, max_results=total_results, start_at=paged_results)
             issues.extend(results['issues'])
             print(len(issues))
 
+    return issues
 
+
+def save_all_issues_to_db(issues):
     issues_df = json_normalize(data=issues, max_level=1, sep='_')
-    issues_df = issues_df.set_index("id", drop = False)
+    issues_df = issues_df.set_index("id", drop=False)
     issues_df = issues_df.where(pd.notnull(issues_df), None)
 
-    return issues_df
+    db_issue_ids = Issue.objects.values_list('id', flat=True)
+    create_issues_df = issues_df[issues_df[issues_df.columns[1]].isin(db_issue_ids)]
+    update_issues_df = issues_df[~issues_df[issues_df.columns[1]].isin(db_issue_ids)]
 
-
-def update_all_issues_to_db():
-    proj_ids = get_all_project_ids()
-    issues_df = get_issues(proj_ids)
-
-    db_ids = Issue.objects.values_list('id', flat=True)
-    update_issues_df = issues_df[issues_df[issues_df.columns[1]].isin(db_ids)]
-    create_issues_df = issues_df[~issues_df[issues_df.columns[1]].isin(db_ids)]
-
-    def dataframe_assignment(df):
-        records= df.to_dict('records')
+    def issue_assignment(df):
+        records = df.to_dict('records')
         instances = [Issue(
-            id = int(record['id']),
-            key = record['key'],
-            url = record['self'],
-            summary = record['fields_summary'],
-            description = record['fields_description'],
-            status_change_date = record['fields_statuscategorychangedate'],
-            created_at = record['fields_created'],
-            updated_at = record['fields_updated'],
-            status_id = record['fields_status']['id'],
-            status_name = record['fields_status']['name'],
-            priority_id = record['fields_priority']['id'],
-            priority_name = record['fields_priority']['name'],
+            id=int(record['id']),
+            key=record['key'],
+            url=record['self'],
+            summary=record['fields_summary'],
+            description=record['fields_description'],
+            status_change_date=record['fields_statuscategorychangedate'],
+            created_at=record['fields_created'],
+            updated_at=record['fields_updated'],
+            status_id=record['fields_status']['id'],
+            status_name=record['fields_status']['name'],
+            priority_id=record['fields_priority']['id'],
+            priority_name=record['fields_priority']['name'],
 
-            project = Project.objects.get(id=int(record['fields_project']['id'])),
-            issue_type = IssueTypes.objects.get(id=int(record['fields_issuetype']['id'])),
-        ) for record in records] 
+            project=Project.objects.get(id=int(record['fields_project']['id'])),
+            issue_type=IssueTypes.objects.get(id=int(record['fields_issuetype']['id'])),
+
+        ) for record in records]
 
         return instances
-    
-    fields = [
+
+    issue_fields = [
         'key',
         'url',
         'summary',
@@ -210,20 +214,67 @@ def update_all_issues_to_db():
         'priority_id',
         'priority_name',
         'project',
-        'issue_type', 
+        'issue_type',
     ]
 
-    Issue.objects.bulk_update(dataframe_assignment(update_issues_df), fields, batch_size=50)
-    Issue.objects.bulk_create(dataframe_assignment(create_issues_df))
+    if not create_issues_df.empty:
+        Issue.objects.bulk_create(issue_assignment(create_issues_df))
+        print('New issues created')
+    try:
+        Issue.objects.bulk_update(issue_assignment(update_issues_df), issue_fields, batch_size=50)
+    except DatabaseError:
+        print('Something went wrong with updating')
 
 
+def save_all_issueimages_to_db(issues):
+    attachment_df = json_normalize(data=issues, record_path=[['fields', 'attachment']], meta=['id'],
+                                   meta_prefix='issue_', sep='_')
+    attachment_df = attachment_df.set_index("id", drop=False)
+    print(attachment_df)
 
-def add_issue_to_jira():
-    pass
+    db_issueimage_ids = IssueImages.objects.values_list('id', flat=True)
+    update_issueimages_df = attachment_df[attachment_df[attachment_df.columns[1]].isin(db_issueimage_ids)]
+    create_issueimages_df = attachment_df[~attachment_df[attachment_df.columns[1]].isin(db_issueimage_ids)]
+
+    def issue_images_assignment(df):
+        records = df.to_dict('records')
+        instances = [IssueImages(
+            id=int(record['id']),
+            filename=record['filename'],
+            content=record['content'],
+            thumbnail=record['thumbnail'],
+
+            issue=Issue.objects.get(id=int(record['issue_id']))
+        ) for record in records]
+
+        return instances
+
+    image_fields = [
+        'filename',
+        'content',
+        'thumbnail',
+        'issue',
+    ]
+    if not create_issueimages_df.empty:
+        IssueImages.objects.bulk_create(issue_images_assignment(create_issueimages_df))
+        print('New images added')
+
+    try:
+        IssueImages.objects.bulk_update(issue_images_assignment(update_issueimages_df), image_fields, batch_size=50)
+        print('Images update Succesfully')
+    except DatabaseError:
+        print('There was an issue with updating images')
 
 
-def get_issue(id):
-    url = BASE_URL + 'issue/' + str(id)
+def update_all_issues_to_db():
+    issues = get_all_issues()
+
+    save_all_issues_to_db(issues)
+    save_all_issueimages_to_db(issues)
+
+
+def get_issue(issue_id):
+    url = BASE_URL + 'issue/' + str(issue_id)
     
     r = requests.get(url, auth=(USER, TOKEN))
     r = r.json()
@@ -231,8 +282,8 @@ def get_issue(id):
     return r
 
 
-def save_issue_to_db(id):
-    issue = get_issue(id)
+def save_issue_to_db(issue_id):
+    issue = get_issue(issue_id)
 
     issue_flattened = json_normalize(data=issue, max_level=1, sep='_')
     issues_flattened = issue_flattened.where(pd.notnull(issue_flattened), None)
@@ -256,8 +307,7 @@ def save_issue_to_db(id):
         project= Project.objects.get(id=int(record['fields_project']['id'])),
         issue_type = IssueTypes.objects.get(id=int(record['fields_issuetype']['id'])),
     ).save()
-    
-    return issue_instance
+
 
 def create_issue(issue):
 
@@ -268,11 +318,20 @@ def create_issue(issue):
 
 
 def update_issue(issue_key, data):
-    jira_issue = jira().issue(issue_key, fields='summary,issuetype,description')
+    jira_issue = jira().issue(issue_key)
+    print(jira_issue)
 
-    response = jira_issue.update(fields=data)
+    if jira_issue:
+        jira_issue.update(fields=data)
+        save_issue_to_db(issue_key)
+        return True
+    else:
+        return False
 
-    print(response)
-    return response
 
-    
+def get_issue_comments(issue_id):
+    issue = jira().issue(issue_id)
+    comments = jira().comments(issue)
+
+    return comments
+
