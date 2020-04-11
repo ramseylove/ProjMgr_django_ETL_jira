@@ -20,6 +20,8 @@ ipython = "*"
 django-prosemirror = "*"
 commonmark = "==0.7.5"
 celery = "*"
+gunicorn = "*"
+whitenoise = "*"
 
 [requires]
 python_version = "3.7"

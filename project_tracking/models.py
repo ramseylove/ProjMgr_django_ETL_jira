@@ -59,7 +59,6 @@ class IssueImages(models.Model):
     filename = models.CharField(max_length=255)
     content = models.URLField()
     thumbnail = models.URLField()
-    image = models.ImageField(verbose_name='Screenshot')
 
     issue = models.ForeignKey('project_tracking.Issue', on_delete=models.CASCADE)
 

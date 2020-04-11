@@ -1,0 +1,34 @@
+version: '2.4'
+services:
+  web: &web
+    build:
+      context: .
+    command: 'gunicorn config.wsgi -b 0.0.0.0:8000'
+    environment:
+      - ENVIRONMENT=production
+      - SECRET_KEY=^l2-z86&t%dv%iywa-j@)j9m9s(fj@4%4qz8%u^m_p8w*obsf1
+      - DEBUG=0
+      - SENDGRID_SMTPKEY=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
+      - JIRA_KEY=HK0cCGHJ5YuxsU83gHxY38C3
+    stdin_open: true
+    tty: true
+    volumes:
+      - '.:/code'
+    ports:
+      - '8000:8000'
+      - '5678:5678'
+    depends_on:
+      - rabbitmq
+      - celery_worker
+
+  # Rabbit MQ message broker
+  rabbitmq:
+    image: rabbitmq:3.8.3-alpine
+  # worker for celery
+  celery_worker:
+    <<: *web
+    command: celery -A config worker --loglevel=info
+    ports: []
+    depends_on:
+      - rabbitmq
+
