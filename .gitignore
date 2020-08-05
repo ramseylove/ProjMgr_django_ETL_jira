@@ -9,4 +9,4 @@
 db.sqlite3
 
 # ignore pyc files created by django or python
-config/__pycache__/*.pyc
+*.pyc
