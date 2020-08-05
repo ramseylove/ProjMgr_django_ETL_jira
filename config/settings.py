@@ -48,7 +48,6 @@ INSTALLED_APPS = [
     'debug_toolbar',
     'django_extensions',
     'arrow',
-    'prosemirror',
 
     # Local Apps
     'users.apps.UsersConfig',

@@ -1,6 +1,5 @@
 from django.db import models
 from django.urls import reverse
-from prosemirror.fields import ProseMirrorField
 from django.template.defaultfilters import slugify
 
 
@@ -24,7 +23,7 @@ class Issue(models.Model):
     key = models.CharField(max_length=10)
     url = models.URLField()
     summary = models.CharField(max_length=300)
-    description = ProseMirrorField(prosemirror_profile="maxi", null=True, blank=True)
+    description = models.TextField(null=True, blank=True)
     status_change_date = models.DateTimeField()
     created_at = models.DateTimeField()
     updated_at = models.DateTimeField()
@@ -59,7 +58,7 @@ class IssueImages(models.Model):
     filename = models.CharField(max_length=255)
     content = models.URLField()
     thumbnail = models.URLField()
-    image = models.ImageField(verbose_name='Screenshot')
+    image = models.ImageField(verbose_name='Screenshot', default='default.jpg')
 
     issue = models.ForeignKey('project_tracking.Issue', on_delete=models.CASCADE)
 

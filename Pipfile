@@ -17,9 +17,9 @@ requests-oauthlib = "*"
 psycopg2-binary = "*"
 pandas = "*"
 ipython = "*"
-django-prosemirror = "*"
 commonmark = "==0.7.5"
-celery = "*"
+celery = "==4.4.2"
+pillow = "*"
 
 [requires]
 python_version = "3.7"
