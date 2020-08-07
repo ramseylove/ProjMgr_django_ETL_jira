@@ -93,8 +93,9 @@ class IssueUpdateView(LoginRequiredMixin, FormView):
 
         context = {
             'form': form,
+            'issue': issue,
             }
-        return render(request, 'project_tracking/issue_create.html', context)
+        return render(request, 'project_tracking/issue_update.html', context)
 
     def post(self, request, *args, **kwargs):
         project_id = self.kwargs['project_id']

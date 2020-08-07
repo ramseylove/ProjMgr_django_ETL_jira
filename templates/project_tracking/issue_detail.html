@@ -3,7 +3,7 @@
     {% include 'includes/navbar.html' %}
 <div class="row wrapper border-bottom white-bg page-heading">
         <div class="col-sm-4">
-            <h2>Issue detail</h2>
+            <h2>{{ issue.project.name }}</h2>
             <ol class="breadcrumb">
                 <li class="breadcrumb-item">
                     <a href="{% url 'project_list' %}">Projects</a>

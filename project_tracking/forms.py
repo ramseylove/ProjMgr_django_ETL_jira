@@ -11,6 +11,7 @@ class CreateIssueForm(ModelForm):
         user = request.user
         self.fields['issue_type'].queryset = IssueTypes.objects.filter(project_id=project_id)
         self.fields['project'].queryset = user.projects.all()
+        self.fields['project'].disabled = True
 
     class Meta:
         model = Issue
@@ -22,11 +23,12 @@ class EditIssueForm(ModelForm):
     def __init__(self, project_id, *args, **kwargs):
         super(EditIssueForm, self).__init__(*args, **kwargs)
         self.fields['issue_type'].queryset = IssueTypes.objects.filter(project_id=project_id)
-        # self.fields['project'].disabled = True
+        self.fields['project'].disabled = True
 
     class Meta:
+        # TODO : hide Project selection drop down menu
         model = Issue
-        fields = ['project', 'summary', 'description', 'issue_type']
+        fields = ['issue_type', 'project', 'summary', 'description', ]
 
 
 class ImageForm(ModelForm):
