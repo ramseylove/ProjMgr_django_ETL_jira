@@ -38,3 +38,6 @@ class ImageForm(ModelForm):
         model = IssueImages
         fields = ('image', )
 
+class AddCommentForm(forms.Form):
+    comment = forms.CharField(label='Add Comment', max_length=255)
+

@@ -6,7 +6,7 @@ from django.views.generic import View, ListView, DetailView, FormView
 
 from .models import Project, Issue
 from .forms import CreateIssueForm, EditIssueForm
-from .services import create_issue, save_issue_to_db, update_issue, get_issue_comments
+from .services import create_issue, save_issue_to_db, update_issue, get_comments
 
 
 class ProjectListView(LoginRequiredMixin, ListView):
@@ -41,7 +41,7 @@ class IssueDetailView(LoginRequiredMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['comments'] = get_issue_comments(self.kwargs['pk'])
+        context['comments'] = get_comments(self.kwargs['pk'])
 
         return context
    
