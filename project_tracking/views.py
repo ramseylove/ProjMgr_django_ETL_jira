@@ -6,8 +6,9 @@ from django.views.generic import View, ListView, DetailView, FormView
 
 
 from .models import Project, Issue
+
 from .forms import CreateIssueForm, EditIssueForm, IssueImages
-from .services import create_issue, save_issue_to_db, update_issue, get_issue_comments
+from .services import create_issue, save_issue_to_db, update_issue, get_comments
 
 
 class ProjectListView(LoginRequiredMixin, ListView):
@@ -42,7 +43,9 @@ class IssueDetailView(LoginRequiredMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['comments'] = get_issue_comments()
+        context['comments'] = get_comments(self.kwargs['pk'])
+
+        return context
    
 
 class IssueCreateView(LoginRequiredMixin, View):
@@ -92,8 +95,9 @@ class IssueUpdateView(LoginRequiredMixin, FormView):
 
         context = {
             'form': form,
+            'issue': issue,
             }
-        return render(request, 'project_tracking/issue_create.html', context)
+        return render(request, 'project_tracking/issue_update.html', context)
 
     def post(self, request, *args, **kwargs):
         project_id = self.kwargs['project_id']
