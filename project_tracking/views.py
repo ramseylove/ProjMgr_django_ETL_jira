@@ -2,10 +2,11 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 from django.shortcuts import render, redirect
 from django.views.generic import View, ListView, DetailView, FormView
+from django.views.generic.detail import SingleObjectMixin
 
 
 from .models import Project, Issue
-from .forms import CreateIssueForm, EditIssueForm
+from .forms import CreateIssueForm, EditIssueForm, AddCommentForm
 from .services import create_issue, save_issue_to_db, update_issue, get_comments
 
 
@@ -42,8 +43,14 @@ class IssueDetailView(LoginRequiredMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['comments'] = get_comments(self.kwargs['pk'])
+        context['form'] = AddCommentForm()
 
         return context
+
+
+class AddCommentView(FormView):
+    # TODO: need an form view to include on issue detail page
+    form_class = AddCommentForm
    
 
 class IssueCreateView(LoginRequiredMixin, View):

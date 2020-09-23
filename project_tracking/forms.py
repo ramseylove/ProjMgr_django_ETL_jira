@@ -38,6 +38,20 @@ class ImageForm(ModelForm):
         model = IssueImages
         fields = ('image', )
 
-class AddCommentForm(forms.Form):
-    comment = forms.CharField(label='Add Comment', max_length=255)
 
+class AddCommentForm(forms.Form):
+    # TODO: need a inline form
+    pass
+#     comment = forms.CharField(
+#         label='Add Comment',
+#         max_length=500,
+#         widget=forms.Textarea(),
+#         help_text='Add a Comment'
+#     )
+#
+#     def clean(self):
+#         cleaned_data = super(AddCommentForm, self).clean()
+#         comment = cleaned_data.get('comment')
+#         if not comment:
+#             raise forms.ValidationError('You need to enter a comment')
+#
