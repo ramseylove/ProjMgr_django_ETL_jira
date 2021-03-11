@@ -8,5 +8,9 @@
 ## ignore sqlite database
 db.sqlite3
 
+## ignore static collect files
+staticfiles/
+
 # ignore pyc files created by django or python
 *.pyc
+

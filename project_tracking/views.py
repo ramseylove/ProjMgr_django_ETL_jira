@@ -1,12 +1,14 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
+from django.forms import modelformset_factory
 from django.shortcuts import render, redirect
 from django.views.generic import View, ListView, DetailView, FormView
 from django.views.generic.detail import SingleObjectMixin
 
 
 from .models import Project, Issue
-from .forms import CreateIssueForm, EditIssueForm, AddCommentForm
+
+from .forms import CreateIssueForm, EditIssueForm, IssueImages, AddCommentForm
 from .services import create_issue, save_issue_to_db, update_issue, get_comments
 
 
