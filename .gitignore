@@ -1,16 +1,31 @@
-## ignore system created files
+# OSX #
 .DS_Store
-
+.bash_history
 ## ignore editor settings
 .vscode/
 .idea/
-
-## ignore sqlite database
-db.sqlite3
+# ignore dotenv file
+envs/*.env
+.env
 
 ## ignore static collect files
+# static/
 staticfiles/
 
 # ignore pyc files created by django or python
 *.pyc
+
+# pipenv files
+.cache/
+.local/
+
+# Byte-compiled / optimized / DLL files #
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Django #
+*.log
+db.sqlite3
+media/
 
