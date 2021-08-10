@@ -7,6 +7,7 @@ from django.views.generic.detail import SingleObjectMixin
 
 
 from .models import Project, Issue
+from .tasks import update_projects, update_issues
 
 from .forms import CreateIssueForm, EditIssueForm, IssueImages, AddCommentForm
 from .services import create_issue, save_issue_to_db, update_issue, get_comments
@@ -16,6 +17,7 @@ class ProjectListView(LoginRequiredMixin, ListView):
     model = Project
     template_name = 'project_tracking/project_list.html'
     context_object_name = 'projects'
+    update_projects.delay()
 
     def get_queryset(self):
         return super(ProjectListView, self).get_queryset().filter(customuser=self.request.user)
@@ -25,6 +27,7 @@ class IssueListView(LoginRequiredMixin, ListView):
     model = Issue
     template_name = 'project_tracking/issue_list.html'
     context_object_name = 'issues'
+    update_issues.delay()
     
     def get_queryset(self):
         return super(IssueListView, self).get_queryset().filter(project_id=self.kwargs['project_id'])

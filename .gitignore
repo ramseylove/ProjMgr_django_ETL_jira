@@ -28,4 +28,6 @@ __pycache__/
 *.log
 db.sqlite3
 media/
+#ignore ipython db
+history.sqlite
 

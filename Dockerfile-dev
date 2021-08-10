@@ -34,9 +34,3 @@ RUN chmod +x /app/scripts/*
 USER app
 
 ENTRYPOINT ["scripts/entrypoint.sh"]
-################  Start New Image  :  Debugger  ############
-# FROM base as debug
-# RUN pipenv install ptvsd
-
-# WORKDIR /code/
-# CMD python -m ptvsd --host 0.0.0.0 --port 5678 --wait --multiprocess manage.py runserver 127.0.0.1:8000

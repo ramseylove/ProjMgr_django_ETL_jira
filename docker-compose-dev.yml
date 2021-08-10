@@ -3,17 +3,14 @@ services:
   web: &web
     build:
       context: .
+      dockerfile: Dockerfile-dev
     command: 'python manage.py runserver 0.0.0.0:8000'
-    environment:
-      - ENVIRONMENT=development
-      - SECRET_KEY=^l2-z86&t%dv%iywa-j@)j9m9s(fj@4%4qz8%u^m_p8w*obsf1
-      - DEBUG=1
-      - SENDGRID_SMTPKEY=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
-      - JIRA_KEY=HK0cCGHJ5YuxsU83gHxY38C3
+    env_file:
+      - envs/dev.env
     stdin_open: true
     tty: true
     volumes:
-      - '.:/code'
+      - '.:/app'
     ports:
       - '8000:8000'
       - '5678:5678'
@@ -24,12 +21,9 @@ services:
   db:
     image: 'postgres:11'
     environment:
-      # - "POSTGRES_HOST_AUTH_METHOD=trust"
-      - POSTGRES_DB=atria_db
-      - POSTGRES_USER=db_user
-      - POSTGRES_PASSWORD=postgres
+      - "POSTGRES_HOST_AUTH_METHOD=trust"
     ports:
-      - '6543:5432'
+      - '5432:5432'
     volumes:
       - 'postgres_data:/var/lib/postgresql/data/'
   # Rabbit MQ message broker
