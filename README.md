@@ -1,10 +1,55 @@
-<img width="400" src="logo.png" alt="DjangoX logo">
+This project management application was build to Extract, Transform, and Load Jira Project data from my businesses Jira
+account. Idea was to have control over project information that clients would see, along with simplify their experience.
 
-A framework for launching new Django projects quickly. Comes with a custom user model, email/password authentication, options for social authentication via Google/Facebook/Twitter/etc, and static assets.
+Flow:
+When a Super User logs in to the admin panel, the service layer creates a task to request all projects and issues from the Jira api.
+It is then transformed into a dataframe and uses Jira Id field to compare agains local db data to determine if there are new or deleted projects.
+Then for issues it compares the Jira updated time with local db 
+An admin needs to log in to create a user and link projects to the users before they can see any data. Super admins can
+see all projects.
 
-> **NOTE**: This open source project is supported by my three published books: [Django for Beginners](https://djangoforbeginners.com/), [Django for APIs](https://djangoforapis.com), and [Django for Professionals](https://djangoforprofessionals.com).
+Once a user logs in, the requests made to the jira api are directly made and new / updated data is pulled into the
+database. Including posting Issues to Jira and DB.
 
-## Features
+Comments were never implemented and project was abandoned.
+
+## Built with
+
+* Jira V2 api 
+* Docker-compose 
+* Postgres 11
+* S3 compatible storage - I used Digital Ocean
+* SendGrid - Smtp email service
+* Celery 4 - Task Queue 
+* RabbitMQ - Message Broker 
+* Migrated to Pip to handle virtual envrionments
+
+### Environment variables that need to be defined in env/dev.env file
+```
+COMPOSE_PROJECT_NAME 
+SECRET_KEY 
+ENVIRONMENT=docker_development # or production
+DEBUG=1 
+ALLOWED_HOSTS=127.0.0.1,localhost,0.0.0.0
+
+SPACES_BUCKET_NAME=  
+SPACES_ACCESS_KEY_ID= 
+SPACES_SECRET_ACCESS_TOKEN= 
+SPACES_SECRET_ACCESS_KEY=
+
+SENDGRID_SMTPKEY= 
+JIRA_KEY=
+
+DB_USER= 
+DB_PORT= 
+DB_HOST=
+```
+
+## Base Project
+
+The base Project was built using [DjangoX](https://github.com/wsvincent/djangox) template created by Will vincent
+
+### Base Features
 
 - For Django 2.2 and Python 3.7
 - Modern virtual environments with [pipenv](https://github.com/pypa/pipenv)
@@ -14,53 +59,10 @@ A framework for launching new Django projects quickly. Comes with a custom user 
 - Social authentication via [django-allauth](https://github.com/pennersr/django-allauth)
 - [django-debug-toolbar](https://github.com/jazzband/django-debug-toolbar)
 
-## First-time setup
-
-1.  Make sure Python 3.7x and Pipenv are already installed. [See here for help](https://djangoforbeginners.com/initial-setup/).
-2.  Clone the repo and configure the virtual environment:
-
-```
-$ git clone https://github.com/wsvincent/djangox.git
-$ cd djangox
-$ pipenv install
-$ pipenv shell
-```
-
-3.  Set up the initial migration for our custom user models in `users` and build the database.
-
-```
-(djangox) $ python manage.py makemigrations users
-(djangox) $ python manage.py migrate
-```
-
-4.  Create a superuser:
-
-```
-(djangox) $ python manage.py createsuperuser
-```
-
-5.  Confirm everything is working:
-
-```
-(djangox) $ python manage.py runserver
-```
-
-Load the site at [http://127.0.0.1:8000](http://127.0.0.1:8000).
-
-![Home](static/images/home_2.2.png)
-
-![Sign Up](static/images/signup_2.2.png)
-
-## Next Steps
+## Other resources
 
 - Use [PostgreSQL locally via Docker](https://wsvincent.com/django-docker-postgresql/)
 - Use [django-environ](https://github.com/joke2k/django-environ) for environment variables
-- Update [EMAIL_BACKEND](https://docs.djangoproject.com/en/2.0/topics/email/#module-django.core.mail) to configure an SMTP backend
+- Update [EMAIL_BACKEND](https://docs.djangoproject.com/en/2.0/topics/email/#module-django.core.mail) to configure an
+  SMTP backend
 - Make the [admin more secure](https://opensource.com/article/18/1/10-tips-making-django-admin-more-secure)
-
-## Adding Social Authentication
-
-- [Configuring Google](https://wsvincent.com/django-allauth-tutorial-custom-user-model/#google-credentials)
-- [Configuring Facebook](http://www.sarahhagstrom.com/2013/09/the-missing-django-allauth-tutorial/#Create_and_configure_a_Facebook_app)
-- [Configuring Github](https://wsvincent.com/django-allauth-tutorial/)
-- `django-allauth` supports [many, many other providers in the official docs](https://django-allauth.readthedocs.io/en/latest/providers.html)
