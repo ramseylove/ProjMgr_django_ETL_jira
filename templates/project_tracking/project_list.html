@@ -31,7 +31,7 @@
                             {% for project in projects %}
                             <tr>
                                 <td class="project-status">
-                                    <span class="label label-primary">Active</span>
+                                    <span class="label label-secondary">Active</span>
                                 </td>
                                 <td class="project-title">
                                     <a href="{% url 'issue_list' project.id %}">{{ project.name }}</a>

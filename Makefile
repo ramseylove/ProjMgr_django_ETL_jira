@@ -1,7 +1,7 @@
-.PHONY: init ci analyze remove_vol build up down migrate migrations superuser collectstatic shell
+.PHONY: init analyze remove_vol build up down migrate migrations superuser collectstatic shell
 
-projectName = atria-web
-dockerComposeFile = docker-compose-dev.yml
+projectName = projmgr_django_etl_jira
+dockerComposeFile = docker-compose.yml
 
 init:
 	curl -sSL https://raw.githubusercontent.com/sdispater/poetry/master/get-poetry.py | python

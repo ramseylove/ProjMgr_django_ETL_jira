@@ -82,8 +82,8 @@ def update_all_issuetypes_to_db(projects):
     issue_types_df = issue_types_df[['id', 'name', 'project_id']]
 
     db_ids = IssueTypes.objects.values_list('id', flat=True)
-    create_issue_types_df = issue_types_df[issue_types_df[issue_types_df.columns[0]].isin(db_ids)]
-    update_issue_types_df = issue_types_df[~issue_types_df[issue_types_df.columns[0]].isin(db_ids)]
+    create_issue_types_df = issue_types_df[~issue_types_df[issue_types_df.columns[0]].isin(db_ids)]
+    update_issue_types_df = issue_types_df[issue_types_df[issue_types_df.columns[0]].isin(db_ids)]
 
     def dataframe_assignment(df):
         records = df.to_dict('records')
@@ -173,8 +173,8 @@ def save_all_issues_to_db(issues):
     issues_df = issues_df.where(pd.notnull(issues_df), None)
 
     db_issue_ids = Issue.objects.values_list('id', flat=True)
-    create_issues_df = issues_df[issues_df[issues_df.columns[1]].isin(db_issue_ids)]
-    update_issues_df = issues_df[~issues_df[issues_df.columns[1]].isin(db_issue_ids)]
+    create_issues_df = issues_df[~issues_df[issues_df.columns[1]].isin(db_issue_ids)]
+    update_issues_df = issues_df[issues_df[issues_df.columns[1]].isin(db_issue_ids)]
 
     def issue_assignment(df):
         records = df.to_dict('records')

@@ -34,3 +34,6 @@ RUN chmod +x /app/scripts/*
 USER app
 
 ENTRYPOINT ["scripts/entrypoint.sh"]
+
+# production server run command should probably be in entrypoint script
+# CMD gunicorn config.wsgi:application --bind 0.0.0.0:$PORT
